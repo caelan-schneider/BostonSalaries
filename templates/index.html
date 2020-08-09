@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style type="text/css">
+		body {
+			font-style: Arial;
+		}
+
+
+		.regular {
+			fill: #84a9ac;
+			stroke: #84a9ac;
+		}
+
+		.overtime {
+			fill: #D9ADAD;
+			stroke: #D9ADAD;
+		}
+
+		.total {
+    		fill: none;
+    		stroke: #ffab00;
+    		stroke-width: 3;
+			}
+
+		/* Style the dots by assigning a fill and stroke */
+		.regularPoints {
+    		fill: #84a9ac;
+    		stroke: #fff;
+			}
+	
+		.overtimePoints {
+    		fill: #D9ADAD;
+    		stroke: #fff;
+			}
+
+		.totalPoints {
+    		fill: #ffab00;
+    		stroke: #fff;
+			}
+
+		#results-table {
+  			border-collapse: collapse;
+  			width: 1000px;
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 12px;
+			}
+
+		#results-table caption {
+			font-size: 15px;
+			padding: 8px;
+		}
+		
+		#results-table th, td {
+  			text-align: left;
+  			padding: 8px;
+			}
+
+		#results-table th {
+			color: white;
+			background-color: #D9ADAD;
+		}
+
+		#results-table tr:nth-child(even) {background-color: #f2f2f2;}
+
+	</style>
+</head>
+<body>
+	<table id="results-table">
+		<thead>
+			<caption><strong>{{org}}</strong></caption>
+			<th>Year</th>
+			<th>Regular</th>
+			<th>Overtime</th>
+			<th>Total</th>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	<div id="viz"></div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="http://d3js.org/d3.v5.min.js"></script>
+	<script>{% include 'script.js' %}</script>
+</body>
+</html>
