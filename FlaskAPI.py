@@ -41,7 +41,8 @@ def get_aggregate(dic, db, agg, org):
         doc["Year"] = doc["_id"]
         doc["_id"] = str(doc["_id"]) + "-" + agg
     output = docs
-    return render_template('index.html', output=output, agg=agg, org=org)
+    return output, agg, org
+    #return render_template('index.html', output=output, agg=agg, org=org)
     
 
 @app.route('/')
@@ -63,7 +64,9 @@ def get_employees_by_cabinet(cabinet):
 @app.route('/department/<dept>', methods=['GET'])
 def get_employees_by_department(dept):
     salaries = mongo.db.salaries
-    return get_aggregate({'Department':dept}, salaries, "sum", dept)
+    sums = get_aggregate({'Department':dept}, salaries, "sum", dept)
+    avgs = get_aggregate({'Department':dept}, salaries, "avg", dept)
+    return render_template('index.html', output=sums[0], avgs = avgs[0], agg=sums[1], org=sums[2])
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
 def get_employees_by_program(dept, program):
