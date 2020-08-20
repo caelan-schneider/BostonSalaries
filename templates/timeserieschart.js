@@ -1,7 +1,7 @@
 var timeserieschart = function () {
     var margin = { top: 50, right: 500, bottom: 50, left: 75 }
         , width = window.innerWidth - margin.left - margin.right // Use the window's width 
-        , height = window.innerHeight - margin.top - margin.bottom // Use the window's height
+        , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
 
     function my(selection) {
 
