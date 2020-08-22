@@ -41,8 +41,7 @@ def get_aggregate(dic, db, agg, org):
         doc["Year"] = doc["_id"]
         doc["_id"] = str(doc["_id"]) + "-" + agg
     output = docs
-    return output, agg, org
-    #return render_template('index.html', output=output, agg=agg, org=org)
+    return output
     
 
 @app.route('/')
@@ -59,19 +58,23 @@ def get_employee_by_name():
 @app.route('/cabinet/<cabinet>', methods=['GET'])
 def get_employees_by_cabinet(cabinet):
     salaries = mongo.db.salaries
-    return get_aggregate({'Cabinet':cabinet}, salaries, "sum", cabinet)
+    sums = get_aggregate({'Cabinet':cabinet}, salaries, "sum", cabinet)
+    avgs = get_aggregate({'Cabinet':cabinet}, salaries, "avg", cabinet)
+    return render_template('index.html', sums=sums, avgs = avgs, org=cabinet)
 
 @app.route('/department/<dept>', methods=['GET'])
 def get_employees_by_department(dept):
     salaries = mongo.db.salaries
     sums = get_aggregate({'Department':dept}, salaries, "sum", dept)
     avgs = get_aggregate({'Department':dept}, salaries, "avg", dept)
-    return render_template('index.html', output=sums[0], avgs = avgs[0], agg=sums[1], org=sums[2])
+    return render_template('index.html', sums=sums, avgs = avgs, org=dept)
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
 def get_employees_by_program(dept, program):
     salaries = mongo.db.salaries
-    return get_aggregate({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "sum", program)
+    sums = get_aggregate({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "sum", program)
+    avgs = get_aggregate({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "avg", program)
+    return render_template('index.html', sums=sums, avgs = avgs, org=program)
 
 if __name__ == '__main__':
     app.run(debug=True)

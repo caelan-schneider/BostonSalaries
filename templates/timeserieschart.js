@@ -4,8 +4,11 @@ var timeserieschart = function () {
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
 
     function my(selection) {
-
         selection.each(function (data) {
+           
+            //Parse the year for propery time scaling
+            var parseYear = d3.timeParse("%Y");
+            data.forEach(function (d) { d.Year = parseYear(d.Year)});
 
             var xScale = d3.scaleTime()
                 .domain([data[0].Year, data[data.length - 1].Year]) // input
@@ -100,24 +103,6 @@ var timeserieschart = function () {
                     .x(function (d, i) { return xScale(d.Year) })
                     .y(function (d, i) { return yScale(d.Total) })
                     .curve(d3.curveMonotoneX));
-
-            // //Regular points
-            // svg.selectAll(".regularPoints")
-            //     .data(data).enter().append("circle")
-            //     .attr("class", "regularPoints")
-            //     .attr("cx", function (d, i) { return xScale(d.Year) })
-            //     .attr("cy", function (d, i) { return yScale(d.Regular) })
-            //     .attr("r", 4)
-            //     .attr("stroke", "#fff")
-            //     .attr("fill", "#84a9ac");
-
-            // //Overtime points
-            // svg.selectAll(".overtimePoints")
-            //     .data(data).enter().append("circle")
-            //     .attr("class", "overtimePoints")
-            //     .attr("cx", function (d, i) { return xScale(d.Year) })
-            //     .attr("cy", function (d, i) { return yScale(d.Overtime + d.Regular) })
-            //     .attr("r", 4);
 
             //Total points
             svg.selectAll(".totalPoints")

@@ -2,99 +2,11 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<style type="text/css">
-		body {
-			font-style: Arial;
-		}
-
-		.line {
-			stroke-width: 3;
-			fill: none;
-		}
-
-		.regular {
-			fill: #dee2ff;
-			stroke: #dee2ff;
-		}
-
-		.overtime {
-			fill: #D9ADAD;
-			stroke: #D9ADAD;
-		}
-
-		.injury {
-			fill: 	#efd3d7;
-			stroke: #efd3d7;
-		}
-
-		.retro {
-			fill: #cbc0d3;
-			stroke:#cbc0d3
-		}
-
-		.other {
-			fill: 	#8e9aaf;
-			stroke:#8e9aaf;
-		}
-
-		.total {
-			fill: none;
-			stroke: #c86860;
-			stroke-width: 3;
-		}
-
-		/* Style the dots by assigning a fill and stroke */
-
-		.overtimePoints {
-			fill: #D9ADAD;
-			stroke: #fff;
-		}
-
-		.totalPoints {
-			fill: #c86860;
-			stroke: #fff;
-		}
-
-		table {
-			border-collapse: collapse;
-			font-family: Arial, Helvetica, sans-serif;
-			font-size: 12px;
-		}
-
-		table caption {
-			font-size: 15px;
-			padding: 8px;
-		}
-
-		table th, td {
-			text-align: left;
-			padding: 8px;
-		}
-
-		th {
-			color: white;
-			background-color: #D9ADAD;
-		}
-
-		table tr:nth-child(even) {
-			background-color: #f2f2f2;
-		}
-	</style>
+	<meta charset="utf-8">	
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}"/>
 </head>
 
 <body>
-	<!-- <table id="results-table">
-		<thead>
-			<caption><strong>{{org}}</strong></caption>
-			<th>Year</th>
-			<th>Regular</th>
-			<th>Overtime</th>
-			<th>Total</th>
-		</thead>
-		<tbody>
-		</tbody>
-	</table> -->
 	<div id="sumtable"></div>
 	<div id="sumchart"></div>
 	<div id="avgtable"></div>
