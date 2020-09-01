@@ -20,7 +20,8 @@ def get_documents(dic, db):
         output = 'No results found.'
     return render_template('index.html', output=output)
 
-def get_aggregate(dic, db, agg, org):
+#helper method for API routes
+def get_aggregate_by_year(dic, db, agg):
     agg_tag = "$" + agg
     query = db.aggregate([
         {"$match" : dic},
@@ -40,9 +41,30 @@ def get_aggregate(dic, db, agg, org):
             doc[k] = round(v, 2)
         doc["Year"] = doc["_id"]
         doc["_id"] = str(doc["_id"]) + "-" + agg
-    output = docs
-    return output
-    
+    return docs
+
+#helper method for API routes
+def get_count_by_year(dic, db, col):
+    query = db.aggregate([
+        {"$match" : {"$and" : [dic, {col: {"$gt":0}}] }},
+        {"$group" : {
+            "_id" : "$Year",
+            "count": {"$sum" : 1}
+        }},
+        {"$sort" : {"_id" : 1}}
+    ]) 
+    docs = [doc for doc in query]
+    for doc in docs:
+        doc["Year"] = doc["_id"]
+        doc["_id"] = str(doc["_id"]) + "-" + col + "Count"
+    return docs
+
+#helper method for API routes
+def get_top_n_for_year(dic, db, col, year, n):
+    query = db.find({"$and" : [dic, {"Year": year}]}, {'_id':False}).sort(col, -1).limit(n)
+    docs = [doc for doc in query]
+    # print(docs)
+    return docs
 
 @app.route('/')
 def index():
@@ -58,22 +80,25 @@ def get_employee_by_name():
 @app.route('/cabinet/<cabinet>', methods=['GET'])
 def get_employees_by_cabinet(cabinet):
     salaries = mongo.db.salaries
-    sums = get_aggregate({'Cabinet':cabinet}, salaries, "sum", cabinet)
-    avgs = get_aggregate({'Cabinet':cabinet}, salaries, "avg", cabinet)
+    sums = get_aggregate_by_year({'Cabinet':cabinet}, salaries, "sum")
+    avgs = get_aggregate_by_year({'Cabinet':cabinet}, salaries, "avg")
     return render_template('index.html', sums=sums, avgs = avgs, org=cabinet)
 
 @app.route('/department/<dept>', methods=['GET'])
 def get_employees_by_department(dept):
     salaries = mongo.db.salaries
-    sums = get_aggregate({'Department':dept}, salaries, "sum", dept)
-    avgs = get_aggregate({'Department':dept}, salaries, "avg", dept)
-    return render_template('index.html', sums=sums, avgs = avgs, org=dept)
+    sums = get_aggregate_by_year({'Department':dept}, salaries, "sum")
+    avgs = get_aggregate_by_year({'Department':dept}, salaries, "avg")
+    injuries = get_count_by_year({"Department": dept}, salaries, "Injury")
+    numEmployees = get_count_by_year({"Department": dept}, salaries, "Total")
+    topFiveEmployees = get_top_n_for_year({"Department":dept}, salaries, "Total", 2019, 5)
+    return render_template('index.html', sums=sums, avgs = avgs, injuries=injuries, numEmployees = numEmployees, org=dept, topFiveEmployees=topFiveEmployees)
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
 def get_employees_by_program(dept, program):
     salaries = mongo.db.salaries
-    sums = get_aggregate({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "sum", program)
-    avgs = get_aggregate({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "avg", program)
+    sums = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "sum")
+    avgs = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "avg")
     return render_template('index.html', sums=sums, avgs = avgs, org=program)
 
 if __name__ == '__main__':

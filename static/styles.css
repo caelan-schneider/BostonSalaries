@@ -47,6 +47,17 @@ body {
     stroke: #fff;
 }
 
+.count {
+    fill: none;
+    stroke: #8e9aaf;
+    stroke-width: 3;
+}
+
+.countPoints {
+    stroke: #fff;
+    fill: #8e9aaf;
+}
+
 table {
     border-collapse: collapse; 
     font-size: 12px;
@@ -74,7 +85,13 @@ th {
     padding-right: 10em;
 }
 
-.tableTitle {
+.totalCell {
+    font-style: italic;
+    padding-right: 10em;
+    padding-left: 4em;
+}
+
+.title {
     font-style: Arial;
     size: 15px;
 }

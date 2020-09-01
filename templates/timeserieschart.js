@@ -1,11 +1,19 @@
 var timeserieschart = function () {
-    var margin = { top: 50, right: 500, bottom: 50, left: 75 }
+    var margin = { top: 20, right: 20, bottom: 40, left: 80 }
         , width = window.innerWidth - margin.left - margin.right // Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
+    var title = "";
 
     function my(selection) {
         selection.each(function (data) {
            
+             //Add title
+             if (title != "") {
+                d3.select(this).append("span")
+                    .attr("class", "title")
+                    .text(title).append("br");
+            }
+
             //Parse the year for propery time scaling
             var parseYear = d3.timeParse("%Y");
             data.forEach(function (d) { d.Year = parseYear(d.Year)});
@@ -112,6 +120,12 @@ var timeserieschart = function () {
                 .attr("cy", function (d, i) { return yScale(d.Total) })
                 .attr("r", 4);
         });
+    }
+
+    my.title = function (value) {
+        if (!arguments.length) return title;
+        title = value;
+        return my;
     }
 
     my.width = function (value) {

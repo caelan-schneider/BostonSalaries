@@ -1,5 +1,5 @@
 var timeseriestable = function () {
-    var margin = { top: 50, right: 500, bottom: 50, left: 75 };
+    var margin = { top: 50, right: 50, bottom: 50, left: 75 };
     var title = "";
     var columns = ["Year", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"];
 
@@ -10,7 +10,7 @@ var timeseriestable = function () {
             //Add title
             if (title != "") {
                 d3.select(this).append("span")
-                    .attr("class", "tableTitle")
+                    .attr("class", "title")
                     .text(title);
             }
 
@@ -23,7 +23,11 @@ var timeseriestable = function () {
             head.append("tr")
                 .selectAll("th")
                 .data(columns).enter().append("th")
-                .text(function (col) { return col });
+                .text(function (col) { return col })
+                .attr("class", function(d){
+                    if(d == "Year"){return "primaryCell"}
+                    if(d == "Total"){return "totalCell"}
+            });
 
             //Create table body and add correct number of rows based on data
             var body = table.append("tbody");
@@ -36,14 +40,16 @@ var timeseriestable = function () {
                         return { "column": col, "value": row[col] };
                     })
                 }).enter().append('td')
-                .text(function (d) { 
+                .text(function (d) {
+                    //reformat columns representing currency amounts to include commas and two decimal places
                     var currency_columns = ['Regular', 'Retro', 'Overtime', 'Injury', 'Other', "Total"];
-                    if(currency_columns.includes(d.column)){return d.value.toLocaleString('en', {minimumFractionDigits: 2});}
-                    else {return d.value ;}
+                    if (currency_columns.includes(d.column)) { return d.value.toLocaleString('en', { minimumFractionDigits: 2 }); }
+                    else { return d.value; }
                 })
                 .attr("class", function (d) {
                     //give class to Year column for special styling
                     if (d.column == "Year") { return "primaryCell" }
+                    if (d.column == "Total") {return "totalCell" }
                 });
         })
     }
@@ -57,6 +63,12 @@ var timeseriestable = function () {
     my.margin = function (value) {
         if (!arguments.length) return margin;
         margin = value;
+        return my;
+    }
+
+    my.columns = function (value) {
+        if (!arguments.length) return columns;
+        columns = value;
         return my;
     }
 
