@@ -13,18 +13,21 @@ console.log(topTenEmployees);
 d3.select("#sumtable")
     .datum(data)
     .call(datatable()
-        .title("TOTAL SALARIES PAID BY YEAR"));
+        .title("TOTAL SALARIES PAID BY YEAR")
+        .formatFirstColumn(true)
+        .formatLastColumn(true));
 
 d3.select("#sumchart")
     .datum(data)
     .call(areachart()
-        .yVals(["Regular", "Overtime", "Injury"])
         .width(800).height(400));
 
 d3.select("#avgtable")
     .datum(avgs)
     .call(datatable()
-        .title("AVERAGE PAY BY YEAR"));
+        .title("AVERAGE PAY BY YEAR")
+        .formatFirstColumn(true)
+        .formatLastColumn(true));
 
 d3.select("#avgchart")
     .datum(avgs)
@@ -50,5 +53,7 @@ d3.select("#mostPaidEmployees")
     .datum(topTenEmployees)
     .call(datatable()
     .title("TOP TEN MOST PAID EMPLOYEES")
-    .columns(["Name", "Title", "Program", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"]));
+    .columns(["Name", "Title", "Program", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"])
+    .formatFirstColumn(false)
+    .formatLastColumn(true));
 

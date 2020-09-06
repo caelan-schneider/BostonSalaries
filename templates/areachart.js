@@ -92,22 +92,22 @@ var areachart = function () {
                     .y1(function(d) { return yScale(d[1])})
                 );
 
-            //Total line
-            svg.append("path")
-                .datum(data)
-                .attr("class", "total")
-                .attr("d", d3.line()
-                    .x(function (d, i) { return xScale(d.Year) })
-                    .y(function (d, i) { return yScale(d.Total) }));
-                    //.curve(d3.curveMonotoneX));
+            // //Total line
+            // svg.append("path")
+            //     .datum(data)
+            //     .attr("class", "total")
+            //     .attr("d", d3.line()
+            //         .x(function (d, i) { return xScale(d.Year) })
+            //         .y(function (d, i) { return yScale(d.Total) }));
+            //         //.curve(d3.curveMonotoneX));
 
-            //Total points
-            svg.selectAll(".totalPoints")
-                .data(data).enter().append("circle")
-                .attr("class", "totalPoints")
-                .attr("cx", function (d, i) { return xScale(d.Year) })
-                .attr("cy", function (d, i) { return yScale(d.Total) })
-                .attr("r", 4);
+            // //Total points
+            // svg.selectAll(".totalPoints")
+            //     .data(data).enter().append("circle")
+            //     .attr("class", "totalPoints")
+            //     .attr("cx", function (d, i) { return xScale(d.Year) })
+            //     .attr("cy", function (d, i) { return yScale(d.Total) })
+            //     .attr("r", 4);
         });
     }
 

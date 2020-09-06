@@ -62,7 +62,6 @@ body {
 table {
     border-collapse: collapse; 
     font-size: 12px;
-
     table-layout: fixed;
 }
 
@@ -71,38 +70,65 @@ table caption {
     white-space: nowrap;
 }
 
-table th, td {
+th, td {
     text-align: left;
-    padding: 0.5em;
     padding-right: 4em;
     width: 1px;
     white-space: nowrap;
+}
+
+th {
+    color: white;
+    background-color: #D9ADAD;
+    padding: 0.5em;
+    padding-left: 1.5em;
+}
+
+td {
+    padding: 1.5em;
+    border-style: solid none;
+    border-width: 1px;
+    border-color: #E8E8E8;
 }
 
 th:last-child, td:last-child {
     width: 100%;
 }
 
-th {
-    color: white;
-    background-color: #D9ADAD;
+table tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+.primaryHeader {
+    padding-left: 2em;
+    padding-right: 6em; 
 }
 
 .primaryCell {
     font-weight: bold;
     padding-left: 2em;
-    padding-right: 8em;
+    padding-right: 6em;
 }
 
-.totalCell {
-    font-style: italic;
+.preFinalHeader {
+    padding-right: 6em;
+}
+
+.preFinalCell {
+    padding-right: 6em;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-right-color: #E8E8E8;
 }
 
 .title {
     font-style: Arial;
     size: 15px;
+    padding: 1em;
+    padding-bottom: 0.5em;
+    display: block;
 }
 
-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+.gridLines line {
+    stroke: #e8e8e8;
 }

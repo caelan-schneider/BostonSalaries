@@ -2,6 +2,8 @@ var datatable = function () {
     var margin = { top: 50, right: 50, bottom: 50, left: 75 };
     var title = "";
     var columns = ["Year", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"];
+    var formatFirstColumn = true;
+    var formatLastColumn = false;
 
     function my(selection) {
 
@@ -25,7 +27,8 @@ var datatable = function () {
                 .data(columns).enter().append("th")
                 .text(function (col) { return col })
                 .attr("class", function(d, i){
-                    if(i == 0){return "primaryCell"}});
+                    if(i == 0 && formatFirstColumn){return "primaryHeader"}
+                    if (i == columns.length -2 && formatLastColumn){return "preFinalHeader"}});
 
             //Create table body and add correct number of rows based on data
             var body = table.append("tbody");
@@ -47,7 +50,8 @@ var datatable = function () {
                 })
                 .attr("class", function (d, i) {
                     //give class to Year column for special styling
-                    if (i == 0) { return "primaryCell" }});
+                    if (i == 0 && formatFirstColumn) { return "primaryCell" }
+                    if (i == columns.length -2 && formatLastColumn){return "preFinalCell"}});
         })
     }
 
@@ -66,6 +70,18 @@ var datatable = function () {
     my.columns = function (value) {
         if (!arguments.length) return columns;
         columns = value;
+        return my;
+    }
+
+    my.formatFirstColumn = function (value) {
+        if (!arguments.length) return formatFirstColumn;
+        formatFirstColumn = value;
+        return my;
+    }
+
+    my.formatLastColumn = function (value) {
+        if (!arguments.length) return formatLastColumn;
+        formatLastColumn = value;
         return my;
     }
 

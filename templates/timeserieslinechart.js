@@ -33,12 +33,12 @@ var timeserieslinechart = function () {
             data.forEach(function (d) { d.Year = parseYear(d.Year)});
 
             var xScale = d3.scaleTime()
-                .domain([data[0].Year, data[data.length - 1].Year]) // input
+                .domain(d3.extent(data, function(d){return d[xVal]})) // input
                 .range([0, width]); // output
 
             var yScale = d3.scaleLinear()
-                .domain([min, max]) // input 
-                .range([height, 0]); // output 
+                .domain([max, min]) // input 
+                .range([0, height]); // output 
 
             //Chart base
             var svg = d3.select(this)
@@ -48,16 +48,24 @@ var timeserieslinechart = function () {
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            svg.append("g")			
+            .attr("class", "gridLines")
+            .call(d3.axisLeft(yScale)
+                .tickSize(-width)
+                .tickFormat("")
+            )
+            .call(g => g.select(".domain").remove());
+            
             // X axis
             svg.append("g")
-                .attr("class", "x axis")
+                .attr("class", "xAxis")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(xScale));
 
             // Y axis
             svg.append("g")
-                .attr("class", "y axis")
-                .call(d3.axisLeft(yScale)); 
+                .attr("class", "yAxis")
+                .call(d3.axisLeft(yScale))
 
             svg.selectAll("#tsLine")
                 .data(yVals)
