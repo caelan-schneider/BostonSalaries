@@ -91,8 +91,8 @@ def get_employees_by_department(dept):
     avgs = get_aggregate_by_year({'Department':dept}, salaries, "avg")
     injuries = get_count_by_year({"Department": dept}, salaries, "Injury")
     numEmployees = get_count_by_year({"Department": dept}, salaries, "Total")
-    topFiveEmployees = get_top_n_for_year({"Department":dept}, salaries, "Total", 2019, 5)
-    return render_template('index.html', sums=sums, avgs = avgs, injuries=injuries, numEmployees = numEmployees, org=dept, topFiveEmployees=topFiveEmployees)
+    topTenEmployees = get_top_n_for_year({"Department":dept}, salaries, "Total", 2019, 10)
+    return render_template('index.html', sums=sums, avgs = avgs, injuries=injuries, numEmployees = numEmployees, org=dept, topTenEmployees=topTenEmployees)
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
 def get_employees_by_program(dept, program):

@@ -1,7 +1,7 @@
-var timeseriestable = function () {
+var ranktable = function () {
     var margin = { top: 50, right: 50, bottom: 50, left: 75 };
     var title = "";
-    var columns = ["Year", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"];
+    var columns = ["Name", "Title", "Program", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"];
 
     function my(selection) {
 
@@ -23,11 +23,7 @@ var timeseriestable = function () {
             head.append("tr")
                 .selectAll("th")
                 .data(columns).enter().append("th")
-                .text(function (col) { return col })
-                .attr("class", function(d){
-                    if(d == "Year"){return "primaryCell"}
-                    if(d == "Total"){return "totalCell"}
-            });
+                .text(function (col) { return col });
 
             //Create table body and add correct number of rows based on data
             var body = table.append("tbody");
@@ -37,6 +33,7 @@ var timeseriestable = function () {
             rows.selectAll("td")
                 .data(function (row) {
                     return columns.map(function (col) {
+                        if(col == "Name") {return {"column": col, "value": row["First"] + " " + row["Last"]}}
                         return { "column": col, "value": row[col] };
                     })
                 }).enter().append('td')
@@ -45,11 +42,6 @@ var timeseriestable = function () {
                     var currency_columns = ['Regular', 'Retro', 'Overtime', 'Injury', 'Other', "Total"];
                     if (currency_columns.includes(d.column)) { return d.value.toLocaleString('en', { minimumFractionDigits: 2 }); }
                     else { return d.value; }
-                })
-                .attr("class", function (d) {
-                    //give class to Year column for special styling
-                    if (d.column == "Year") { return "primaryCell" }
-                    if (d.column == "Total") {return "totalCell" }
                 });
         })
     }

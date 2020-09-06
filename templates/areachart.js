@@ -1,8 +1,10 @@
-var timeserieschart = function () {
+var areachart = function () {
     var margin = { top: 20, right: 20, bottom: 40, left: 80 }
         , width = window.innerWidth - margin.left - margin.right // Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
     var title = "";
+    var xVal = "Year";
+    var yVals = ["Regular", "Overtime", "Injury", "Retro", "Other"];
 
     function my(selection) {
         selection.each(function (data) {
@@ -43,7 +45,7 @@ var timeserieschart = function () {
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             //chart legend
-            keys = ["Regular", "Overtime", "Injury", "Retro", "Other"].reverse();
+            var keys = yVals.reverse();
             svg.selectAll("#legendPoints")
                 .data(keys)
                 .enter()
@@ -73,56 +75,22 @@ var timeserieschart = function () {
             svg.append("g")
                 .attr("class", "y axis")
                 .call(d3.axisLeft(yScale)); 
-
-            // Regular area
-            svg.append("path")
-                .datum(data)
-                .attr("class", "regular")
-                .attr("d", d3.area()
-                    .x(function (d, i) { return xScale(d.Year) })
-                    .y0(height)
-                    .y1(function (d, i) { return yScale(d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
-
-            //Overtime area
-            svg.append("path")
-                .datum(data)
-                .attr("class", "overtime")
-                .attr("d", d3.area()
-                    .x(function (d, i) { return xScale(d.Year) })
-                    .y0(function (d, i) { return yScale(d.Regular) })
-                    .y1(function (d, i) { return yScale(d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
-
-            //Injury area
-            svg.append("path")
-                .datum(data)
-                .attr("class", "injury")
-                .attr("d", d3.area()
-                    .x(function (d, i) { return xScale(d.Year) })
-                    .y0(function (d, i) { return yScale(d.Overtime + d.Regular) })
-                    .y1(function (d, i) { return yScale(d.Injury + d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
-
-            //Retro area
-            svg.append("path")
-                .datum(data)
-                .attr("class", "retro")
-                .attr("d", d3.area()
-                    .x(function (d, i) { return xScale(d.Year) })
-                    .y0(function (d, i) { return yScale(d.Injury + d.Overtime + d.Regular) })
-                    .y1(function (d, i) { return yScale(d.Retro + d.Injury + d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
-
-            //Other area
-            svg.append("path")
-                .datum(data)
-                .attr("class", "other")
-                .attr("d", d3.area()
-                    .x(function (d, i) { return xScale(d.Year) })
-                    .y0(function (d, i) { return yScale(d.Injury + d.Retro + d.Overtime + d.Regular) })
-                    .y1(function (d, i) { return yScale(d.Other + d.Retro + d.Injury + d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
+            
+            var stackedData = d3.stack()
+                .keys(yVals.reverse())
+                (data)
+            console.log(stackedData);
+            
+            svg.selectAll(".layers")
+                .data(stackedData)
+                .enter()
+                .append("path")
+                .attr("class", function(d){return d.key.toLowerCase()})
+                .attr("d",d3.area()
+                    .x(function (d) { return xScale(d.data[xVal]) })
+                    .y0(function(d) { return yScale(d[0])})
+                    .y1(function(d) { return yScale(d[1])})
+                );
 
             //Total line
             svg.append("path")
@@ -164,6 +132,18 @@ var timeserieschart = function () {
     my.margin = function (value) {
         if (!arguments.length) return margin;
         margin = value;
+        return my;
+    }
+
+    my.xVal = function (value) {
+        if (!arguments.length) return xVal;
+        xVal = value;
+        return my;
+    }
+
+    my.yVals = function (value) {
+        if (!arguments.length) return yVals;
+        yVals = value;
         return my;
     }
 

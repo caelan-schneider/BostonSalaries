@@ -2,45 +2,53 @@ var data = JSON.parse('{{ sums | tojson | safe }}');
 var avgs = JSON.parse('{{ avgs | tojson | safe }}');
 var injuries = JSON.parse('{{ injuries | tojson | safe }}');
 var numEmployees = JSON.parse('{{ numEmployees | tojson | safe }}');
-var topFiveEmployees = JSON.parse('{{ topFiveEmployees | tojson | safe }}')
+var topTenEmployees = JSON.parse('{{ topTenEmployees | tojson | safe }}')
 
 console.log(data);
 console.log(avgs);
 console.log(injuries);
 console.log(numEmployees);
-console.log(topFiveEmployees);
+console.log(topTenEmployees);
 
-var sum_table = timeseriestable()
-    .title("TOTAL SALARIES PAID BY YEAR");
 d3.select("#sumtable")
     .datum(data)
-    .call(sum_table);
+    .call(datatable()
+        .title("TOTAL SALARIES PAID BY YEAR"));
 
-var sum_chart = timeserieschart()
-    .width(800).height(400);
 d3.select("#sumchart")
     .datum(data)
-    .call(sum_chart);
+    .call(areachart()
+        .yVals(["Regular", "Overtime", "Injury"])
+        .width(800).height(400));
 
 d3.select("#avgtable")
     .datum(avgs)
-    .call(timeseriestable()
+    .call(datatable()
         .title("AVERAGE PAY BY YEAR"));
-
 
 d3.select("#avgchart")
     .datum(avgs)
-    .call(timeserieschart()
+    .call(areachart()
         .width(800).height(400));
 
 d3.select("#countschart")
     .datum(numEmployees)
     .call(timeserieslinechart()
+        .xVal("Year")
+        .yVals(["count"])
+        .min(0)
         .width(800).height(200).title("TOTAL NUMBER OF EMPLOYEES BY YEAR"));
 
 d3.select("#injurychart")
     .datum(injuries)
     .call(timeserieslinechart()
+        .xVal("Year")
+        .yVals(["count"])
         .width(800).height(200).title("NUMBER OF INJURIES BY YEAR").min(0));
 
+d3.select("#mostPaidEmployees")
+    .datum(topTenEmployees)
+    .call(datatable()
+    .title("TOP TEN MOST PAID EMPLOYEES")
+    .columns(["Name", "Title", "Program", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"]));
 

@@ -3,6 +3,8 @@ var timeserieslinechart = function () {
         , width = window.innerWidth - margin.left - margin.right // Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
     var title = "";
+    var xVal = "Year";
+    var yVals = ["Total"];
 
     var max, min;
 
@@ -57,23 +59,37 @@ var timeserieslinechart = function () {
                 .attr("class", "y axis")
                 .call(d3.axisLeft(yScale)); 
 
-            //Count line
-            svg.append("path")
-                .datum(data)
-                .attr("class", "count")
-                .attr("d", d3.line()
-                    .x(function (d, i) { return xScale(d.Year) })
-                    .y(function (d, i) { return yScale(d.count) }));
-                    //.curve(d3.curveMonotoneX));
+            svg.selectAll("#tsLine")
+                .data(yVals)
+                .enter()
+                .append("path")
+                .each(function(line){
+                    d3.select(this).datum(data)
+                    .attr("class", line.toLowerCase())
+                    .attr("d", d3.line()
+                        .x(function (d, i) { return xScale(d[xVal]) })
+                        .y(function (d, i) { return yScale(d[line]) }))
+                    });
 
             //Count points
-            svg.selectAll(".countPoints")
-                .data(data).enter().append("circle")
-                .attr("class", "countPoints")
-                .attr("cx", function (d, i) { return xScale(d.Year) })
-                .attr("cy", function (d, i) { return yScale(d.count) })
-                .attr("r", 5);
-        });
+            svg.selectAll(".categories")
+                .data(yVals)
+                .enter()
+                .append("g")
+                .each(function(line){
+                    pointsClass = line.toLowerCase() + "Points";
+                    console.log(pointsClass);
+                    d3.select(this)
+                        .selectAll(".points")
+                        .data(data)
+                        .enter()
+                        .append("circle")
+                        .attr("class", pointsClass)
+                        .attr("cx", function (d, i) { return xScale(d[xVal]) })
+                        .attr("cy", function (d, i) { return yScale(d[line]) })
+                        .attr("r", 5);
+                    });
+            }) 
     }
 
     my.title = function (value) {
@@ -112,5 +128,17 @@ var timeserieslinechart = function () {
         return my;
     }
 
+    my.xVal = function (value) {
+        if (!arguments.length) return xVal;
+        xVal = value;
+        return my;
+    }
+
+    my.yVals = function (value) {
+        if (!arguments.length) return yVals;
+        yVals = value;
+        return my;
+    }
+    
     return my;
 }
