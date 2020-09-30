@@ -1,34 +1,45 @@
 var datatable = function () {
-    var margin = { top: 50, right: 50, bottom: 50, left: 75 };
+    var width = 800;
+    var height = 400;
     var title = "";
-    var columns = ["Year", "Regular", "Retro", "Overtime", "Injury", "Other", "Total"];
+    var dimensions = ["Year"]
+    var measures = ["Regular", "Retro", "Overtime", "Injury", "Other", "Total"];
     var formatFirstColumn = true;
     var formatLastColumn = false;
 
     function my(selection) {
 
         selection.each(function (data) {
+            var allColumns = dimensions.concat(measures);
+
+            //Create table
+            var tableWrapper = d3.select(this)
+                .append("div")
+                    .attr("class", "table-wrapper");
+                    
+            tableWrapper.style("width", width + "px");
+            tableWrapper.style("height", height + "px");
 
             //Add title
             if (title != "") {
-                d3.select(this).append("span")
+                tableWrapper.append("span")
                     .attr("class", "title")
                     .text(title);
             }
-
-            //Create table
-            var table = d3.select(this)
-                .append("table");
+                    
+            var table = tableWrapper.append("table");
 
             //Create table header and add column headers
             var head = table.append("thead");
             head.append("tr")
                 .selectAll("th")
-                .data(columns).enter().append("th")
+                .data(allColumns).enter().append("th")
                 .text(function (col) { return col })
                 .attr("class", function(d, i){
-                    if(i == 0 && formatFirstColumn){return "primaryHeader"}
-                    if (i == columns.length -2 && formatLastColumn){return "preFinalHeader"}});
+                    if(i == 0 && formatFirstColumn){return "primary-header"}
+                    if (i == allColumns.length -2 && formatLastColumn){return "pre-final-header"}
+                    if (i == allColumns.length -1 && formatLastColumn){return "final-header"}
+                });
 
             //Create table body and add correct number of rows based on data
             var body = table.append("tbody");
@@ -37,21 +48,21 @@ var datatable = function () {
             //Create cell for each row and column
             rows.selectAll("td")
                 .data(function (row) {
-                    return columns.map(function (col) {
-                        if(col == "Name") {return {"column": col, "value": row["First"] + " " + row["Last"]}}
+                    return allColumns.map(function (col) {
                         return { "column": col, "value": row[col] };
                     })
                 }).enter().append('td')
                 .text(function (d) {
                     //reformat columns representing currency amounts to include commas and two decimal places
-                    var currency_columns = ['Regular', 'Retro', 'Overtime', 'Injury', 'Other', "Total"];
-                    if (currency_columns.includes(d.column)) { return d.value.toLocaleString('en', { minimumFractionDigits: 2 }); }
+                    if (measures.includes(d.column)) { return d.value.toLocaleString('en', { minimumFractionDigits: 2 }); }
                     else { return d.value; }
                 })
                 .attr("class", function (d, i) {
                     //give class to Year column for special styling
-                    if (i == 0 && formatFirstColumn) { return "primaryCell" }
-                    if (i == columns.length -2 && formatLastColumn){return "preFinalCell"}});
+                    if (i == 0 && formatFirstColumn) { return "primary-cell" }
+                    if (i == allColumns.length -2 && formatLastColumn){return "pre-final-cell"}
+                    if (i == allColumns.length -1 && formatLastColumn){return "final-cell"}
+                });
         })
     }
 
@@ -61,15 +72,27 @@ var datatable = function () {
         return my;
     }
 
-    my.margin = function (value) {
-        if (!arguments.length) return margin;
-        margin = value;
+    my.dimensions = function (value) {
+        if (!arguments.length) return dimensions;
+        dimensions = value;
         return my;
     }
 
-    my.columns = function (value) {
-        if (!arguments.length) return columns;
-        columns = value;
+    my.measures = function (value) {
+        if (!arguments.length) return measures;
+        measures = value;
+        return my;
+    }
+
+    my.width = function(value) {
+        if (!arguments.length) return width;
+        width = value;
+        return my;
+    }
+
+    my.height = function(value) {
+        if (!arguments.length) return height;
+        height = value;
         return my;
     }
 

@@ -6,17 +6,10 @@ var timeserieschart = function () {
 
     function my(selection) {
         selection.each(function (data) {
-           
-             //Add title
-             if (title != "") {
-                d3.select(this).append("span")
-                    .attr("class", "title")
-                    .text(title).append("br");
-            }
 
             //Parse the year for propery time scaling
             var parseYear = d3.timeParse("%Y");
-            data.forEach(function (d) { d.Year = parseYear(d.Year)});
+            data.forEach(function (d) { d.Year = parseYear(d.Year) });
 
             var xScale = d3.scaleTime()
                 .domain([data[0].Year, data[data.length - 1].Year]) // input
@@ -34,8 +27,25 @@ var timeserieschart = function () {
                 .domain([0, max]) // input 
                 .range([height, 0]); // output 
 
+
+            var innerWrapper = d3.select(this)
+                .append("div")
+                .attr("class", "inner-wrapper");
+
+            innerWrapper.style("width", width);
+            innerWrapper.style("height", height);
+
+
+            //Add title
+            if (title != "") {
+                innerWrapper.append("span")
+                    .attr("class", "title")
+                    .text(title).append("br");
+            }
+
+
             //Chart base
-            var svg = d3.select(this)
+            var svg = innerWrapper
                 .append("svg")
                 .attr("width", width + margin.left + margin.right + 200)
                 .attr("height", height + margin.top + margin.bottom)
@@ -44,24 +54,24 @@ var timeserieschart = function () {
 
             //chart legend
             keys = ["Regular", "Overtime", "Injury", "Retro", "Other"].reverse();
-            svg.selectAll("#legendPoints")
+            svg.selectAll("#legend-points")
                 .data(keys)
                 .enter()
                 .append("circle")
                 .attr("r", 7)
-                .attr("class", function(d){return d.toLowerCase()})
+                .attr("class", function (d) { return d.toLowerCase() })
                 .attr("cx", width + 40)
-                .attr("cy", function(d, i){return margin.top + i * 20});
+                .attr("cy", function (d, i) { return margin.top + i * 20 });
 
-            svg.selectAll("#legendText")
+            svg.selectAll("#legend-text")
                 .data(keys)
                 .enter()
                 .append("text")
-                .text(function(d){return d})
+                .text(function (d) { return d })
                 .attr("x", width + 55)
-                .attr("y", function(d, i){return margin.top + i * 20 + 3.5})
+                .attr("y", function (d, i) { return margin.top + i * 20 + 3.5 })
                 .attr("font-size", "12px");
-                
+
 
             // X axis
             svg.append("g")
@@ -72,7 +82,7 @@ var timeserieschart = function () {
             // Y axis
             svg.append("g")
                 .attr("class", "y axis")
-                .call(d3.axisLeft(yScale)); 
+                .call(d3.axisLeft(yScale));
 
             // Regular area
             svg.append("path")
@@ -82,7 +92,7 @@ var timeserieschart = function () {
                     .x(function (d, i) { return xScale(d.Year) })
                     .y0(height)
                     .y1(function (d, i) { return yScale(d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
+            //.curve(d3.curveMonotoneX));
 
             //Overtime area
             svg.append("path")
@@ -92,7 +102,7 @@ var timeserieschart = function () {
                     .x(function (d, i) { return xScale(d.Year) })
                     .y0(function (d, i) { return yScale(d.Regular) })
                     .y1(function (d, i) { return yScale(d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
+            //.curve(d3.curveMonotoneX));
 
             //Injury area
             svg.append("path")
@@ -102,7 +112,7 @@ var timeserieschart = function () {
                     .x(function (d, i) { return xScale(d.Year) })
                     .y0(function (d, i) { return yScale(d.Overtime + d.Regular) })
                     .y1(function (d, i) { return yScale(d.Injury + d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
+            //.curve(d3.curveMonotoneX));
 
             //Retro area
             svg.append("path")
@@ -112,7 +122,7 @@ var timeserieschart = function () {
                     .x(function (d, i) { return xScale(d.Year) })
                     .y0(function (d, i) { return yScale(d.Injury + d.Overtime + d.Regular) })
                     .y1(function (d, i) { return yScale(d.Retro + d.Injury + d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
+            //.curve(d3.curveMonotoneX));
 
             //Other area
             svg.append("path")
@@ -122,7 +132,7 @@ var timeserieschart = function () {
                     .x(function (d, i) { return xScale(d.Year) })
                     .y0(function (d, i) { return yScale(d.Injury + d.Retro + d.Overtime + d.Regular) })
                     .y1(function (d, i) { return yScale(d.Other + d.Retro + d.Injury + d.Overtime + d.Regular) }));
-                    //.curve(d3.curveMonotoneX));
+            //.curve(d3.curveMonotoneX));
 
             //Total line
             svg.append("path")
@@ -131,15 +141,15 @@ var timeserieschart = function () {
                 .attr("d", d3.line()
                     .x(function (d, i) { return xScale(d.Year) })
                     .y(function (d, i) { return yScale(d.Total) }));
-                    //.curve(d3.curveMonotoneX));
+            //.curve(d3.curveMonotoneX));
 
             //Total points
-            svg.selectAll(".totalPoints")
+            svg.selectAll(".total-points")
                 .data(data).enter().append("circle")
-                .attr("class", "totalPoints")
+                .attr("class", "total-points")
                 .attr("cx", function (d, i) { return xScale(d.Year) })
                 .attr("cy", function (d, i) { return yScale(d.Total) })
-                .attr("r", 4);
+                .attr("r", 4)
         });
     }
 
