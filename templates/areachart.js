@@ -1,6 +1,6 @@
 var areachart = function () {
-    var margin = { top: 20, right: 20, bottom: 40, left: 80 }
-        , width = window.innerWidth - margin.left - margin.right// Use the window's width 
+    var margin = { top: 20, right:20, bottom: 40, left: 100 }
+        , width = window.innerWidth// Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
     var title = "";
     var xVal = "Year";

@@ -67,28 +67,37 @@ def get_top_n_for_year(dic, db, col, year, n):
     # print(docs)
     return docs
 
-def get_subgroup_counts(dic, db, group):
+def get_subgroup_counts(dic, db, group, year):
     if group not in ("Cabinet", "Department", "Program"):
         raise ValueError("Input is not a valid group.")
     query = db.aggregate([
-        {"$match": {"$and" : [{group: {"$exists" : True}}, dic]}},
+        {"$match": {"$and" : [{group: {"$exists" : True}}, dic, {"Year": year}]}},
         {"$group" : {
-            "_id" : {"Year":"$Year", group:"$"+group}
+            "_id" : "$"+group
             ,"count": {"$sum" : 1}
         }},
         {"$sort" : {"_id" : 1}}
     ]) 
     docs = [doc for doc in query]
-    for doc in docs:
-        doc[group] = doc["_id"][group]
-        doc["Year"] = doc["_id"]["Year"]
     return docs 
 
-
-
 @app.route('/')
-def index():
-    return render_template('index.html')
+def get_all():
+    salaries = mongo.db.salaries
+    sums = get_aggregate_by_year({}, salaries, "sum")
+    avgs = get_aggregate_by_year({}, salaries, "avg")
+    injuries = get_count_by_year({}, salaries, "Injury")
+    numEmployees = get_count_by_year({}, salaries, "Total")
+    topTenEmployees = get_top_n_for_year({}, salaries, "Total", 2019, 10)
+    totalsForYear = get_documents({"Year":2019}, {"Year":True, "Total":True}, salaries)
+    return render_template('departments.html' \
+        , dept = "ALL EMPLOYEES" \
+        , sums = sums \
+        , avgs = avgs \
+        , injuries=injuries \
+        , numEmployees = numEmployees \
+        , topTenEmployees=topTenEmployees \
+        , totalsForYear = totalsForYear)
 
 @app.route('/employee/', methods=['GET'])
 def get_employee_by_name():
@@ -99,13 +108,27 @@ def get_employee_by_name():
 
 @app.route('/cabinet/<cabinet>', methods=['GET'])
 def get_employees_by_cabinet(cabinet):
+    cabinet = cabinet.upper()
     salaries = mongo.db.salaries
     sums = get_aggregate_by_year({'Cabinet':cabinet}, salaries, "sum")
     avgs = get_aggregate_by_year({'Cabinet':cabinet}, salaries, "avg")
-    return render_template('index.html', sums=sums, avgs = avgs, org=cabinet)
+    injuries = get_count_by_year({"Cabinet":cabinet}, salaries, "Injury")
+    numEmployees = get_count_by_year({"Cabinet":cabinet}, salaries, "Total")
+    topTenEmployees = get_top_n_for_year({"Cabinet":cabinet}, salaries, "Total", 2019, 10)
+    totalsForYear = get_documents({"Year":2019, "Cabinet":cabinet}, {"Year":True, "Total":True}, salaries)
+
+    return render_template('cabinets.html' \
+        , cabinet = cabinet \
+        , sums = sums \
+        , avgs = avgs \
+        , injuries=injuries \
+        , numEmployees = numEmployees \
+        , topTenEmployees=topTenEmployees \
+        , totalsForYear = totalsForYear)
 
 @app.route('/department/<dept>', methods=['GET'])
 def get_employees_by_department(dept):
+    dept = dept.upper()
     salaries = mongo.db.salaries
     sums = get_aggregate_by_year({'Department':dept}, salaries, "sum")
     avgs = get_aggregate_by_year({'Department':dept}, salaries, "avg")
@@ -113,15 +136,36 @@ def get_employees_by_department(dept):
     numEmployees = get_count_by_year({"Department": dept}, salaries, "Total")
     topTenEmployees = get_top_n_for_year({"Department":dept}, salaries, "Total", 2019, 10)
     totalsForYear = get_documents({"Year":2019, "Department":dept}, {"Year":True, "Total":True}, salaries)
-    return render_template('index.html', dept = dept, sums = sums, avgs = avgs, injuries=injuries, numEmployees = numEmployees
-    , org=dept, topTenEmployees=topTenEmployees, totalsForYear = totalsForYear)
+
+    return render_template('departments.html' \
+        , dept = dept \
+        , sums = sums \
+        , avgs = avgs \
+        , injuries=injuries \
+        , numEmployees = numEmployees \
+        , topTenEmployees=topTenEmployees \
+        , totalsForYear = totalsForYear)
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
 def get_employees_by_program(dept, program):
+    program = program.upper()
     salaries = mongo.db.salaries
     sums = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "sum")
     avgs = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "avg")
-    return render_template('index.html', sums=sums, avgs = avgs, org=program)
+    injuries = get_count_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Injury")
+    numEmployees = get_count_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Total")
+    topTenEmployees = get_top_n_for_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Total", 2019, 10)
+    totalsForYear = get_documents({'Year':2019, 'Department':dept, 'Program':program}, {"Year":True, "Total":True}, salaries)
+    return render_template('programs.html' \
+        , program = program \
+        , dept = dept \
+        , sums = sums \
+        , avgs = avgs \
+        , injuries=injuries \
+        , numEmployees = numEmployees \
+        , topTenEmployees=topTenEmployees \
+        , totalsForYear = totalsForYear)
+        
 
 if __name__ == '__main__':
     app.run(debug=True)
