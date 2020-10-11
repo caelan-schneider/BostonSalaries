@@ -28,6 +28,9 @@ var areachart = function () {
                 return sum;
             });
 
+            var yValsVisible = yVals.slice(0);
+            console.log(yValsVisible);
+
             var yScale = d3.scaleLinear()
                 .domain([0, max]) // input 
                 .range([height - 1, 0])
@@ -64,7 +67,20 @@ var areachart = function () {
                 .attr("r", 7)
                 .attr("class", function (d) { return d.toLowerCase() })
                 .attr("cx", width + 40)
-                .attr("cy", function (d, i) { return margin.top + i * 20 });
+                .attr("cy", function (d, i) { return margin.top + i * 20 })
+                .on("click", function (d, i, n) {
+                    svg.selectAll(".layers").remove();
+                    index = yValsVisible.indexOf(d); 
+                    if(index >= 0){
+                        yValsVisible.splice(index, 1);
+                        d3.select(n[i]).attr("class", "unselected");
+                    }
+                    else {
+                        yValsVisible.push(d);
+                        d3.select(n[i]).attr("class", function(d) {return d.toLowerCase()});
+                    }
+                    update(yValsVisible);
+                });;
 
             svg.selectAll("#legend-text")
                 .data(keys)
@@ -87,19 +103,22 @@ var areachart = function () {
                 .attr("class", "y axis")
                 .call(d3.axisLeft(yScale));
 
-            var stackGenerator = d3.stack().keys(yVals.reverse());
+            function update(cols) {
+            var stackGenerator = d3.stack().keys(cols);
             var stackedData = stackGenerator(data);
 
             svg.selectAll(".layers")
                 .data(stackedData)
                 .enter()
                 .append("path")
-                .attr("class", function (d) { return d.key.toLowerCase() })
+                .attr("class", function (d) { return d.key.toLowerCase() + " layers"})
                 .attr("d", d3.area()
                     .x(function (d) { return xScale(d.data[xVal]) })
                     .y0(function (d) { return yScale(d[0]) })
                     .y1(function (d) { return yScale(d[1]) })
                 );
+            }
+            update(yValsVisible);
         });
     }
 

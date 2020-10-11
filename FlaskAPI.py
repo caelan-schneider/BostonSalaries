@@ -60,12 +60,27 @@ def get_count_by_year(dic, db, col):
         doc["_id"] = str(doc["_id"]) + "-" + col + "Count"
     return docs
 
-#helper method for API routes
-def get_top_n_for_year(dic, db, col, year, n):
-    query = db.find({"$and" : [dic, {"Year": year}]}, {'_id':False}).sort(col, -1).limit(n)
+def get_all_years(dic, db):
+    query = db.distinct("Year", dic)
     docs = [doc for doc in query]
-    # print(docs)
+    docs.sort(reverse=True)
     return docs
+
+#helper method for API routes
+def get_top_n_by_year(dic, db, years, col, n):
+    docs = {}
+    for year in years:
+        query = db.find({"$and" : [dic, {"Year":year}]}, {'_id':False}).sort(col, -1).limit(n)
+        docs[year] = [doc for doc in query]
+    return docs
+
+def get_totals_by_year(dic, db, years):
+    docs = {}
+    for year in years:
+        query = get_documents({"$and": [dic, {"Year":year}]}, {"Year":True, "Total":True}, db)
+        docs[year] = query
+    return docs
+
 
 def get_subgroup_counts(dic, db, group, year):
     if group not in ("Cabinet", "Department", "Program"):
@@ -88,15 +103,18 @@ def get_all():
     avgs = get_aggregate_by_year({}, salaries, "avg")
     injuries = get_count_by_year({}, salaries, "Injury")
     numEmployees = get_count_by_year({}, salaries, "Total")
-    topTenEmployees = get_top_n_for_year({}, salaries, "Total", 2019, 10)
-    totalsForYear = get_documents({"Year":2019}, {"Year":True, "Total":True}, salaries)
+    allYears = get_all_years({}, salaries)
+    topTenEmployees = get_top_n_by_year({}, salaries, allYears, "Total", 10)
+    totalsForYear = get_totals_by_year({}, salaries, allYears)
+    
     return render_template('departments.html' \
         , dept = "ALL EMPLOYEES" \
         , sums = sums \
         , avgs = avgs \
-        , injuries=injuries \
+        , injuries = injuries \
         , numEmployees = numEmployees \
-        , topTenEmployees=topTenEmployees \
+        , allYears = allYears \
+        , topTenEmployees = topTenEmployees \
         , totalsForYear = totalsForYear)
 
 @app.route('/employee/', methods=['GET'])
@@ -114,8 +132,9 @@ def get_employees_by_cabinet(cabinet):
     avgs = get_aggregate_by_year({'Cabinet':cabinet}, salaries, "avg")
     injuries = get_count_by_year({"Cabinet":cabinet}, salaries, "Injury")
     numEmployees = get_count_by_year({"Cabinet":cabinet}, salaries, "Total")
-    topTenEmployees = get_top_n_for_year({"Cabinet":cabinet}, salaries, "Total", 2019, 10)
-    totalsForYear = get_documents({"Year":2019, "Cabinet":cabinet}, {"Year":True, "Total":True}, salaries)
+    allYears = get_all_years({"Cabinet":cabinet}, salaries)
+    topTenEmployees = get_top_n_by_year({"Cabinet":cabinet}, salaries, allYears, "Total", 10)
+    totalsForYear = get_totals_by_year({"Cabinet":cabinet}, salaries, allYears)
 
     return render_template('cabinets.html' \
         , cabinet = cabinet \
@@ -123,6 +142,7 @@ def get_employees_by_cabinet(cabinet):
         , avgs = avgs \
         , injuries=injuries \
         , numEmployees = numEmployees \
+        , allYears = allYears \
         , topTenEmployees=topTenEmployees \
         , totalsForYear = totalsForYear)
 
@@ -134,8 +154,9 @@ def get_employees_by_department(dept):
     avgs = get_aggregate_by_year({'Department':dept}, salaries, "avg")
     injuries = get_count_by_year({"Department": dept}, salaries, "Injury")
     numEmployees = get_count_by_year({"Department": dept}, salaries, "Total")
-    topTenEmployees = get_top_n_for_year({"Department":dept}, salaries, "Total", 2019, 10)
-    totalsForYear = get_documents({"Year":2019, "Department":dept}, {"Year":True, "Total":True}, salaries)
+    allYears = get_all_years({"Department":dept}, salaries)
+    topTenEmployees = get_top_n_by_year({"Department":dept}, salaries, allYears, "Total", 10)
+    totalsForYear = get_totals_by_year({"Department":dept}, salaries, allYears)
 
     return render_template('departments.html' \
         , dept = dept \
@@ -143,6 +164,7 @@ def get_employees_by_department(dept):
         , avgs = avgs \
         , injuries=injuries \
         , numEmployees = numEmployees \
+        , allYears = allYears \
         , topTenEmployees=topTenEmployees \
         , totalsForYear = totalsForYear)
 
@@ -154,8 +176,9 @@ def get_employees_by_program(dept, program):
     avgs = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "avg")
     injuries = get_count_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Injury")
     numEmployees = get_count_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Total")
-    topTenEmployees = get_top_n_for_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Total", 2019, 10)
-    totalsForYear = get_documents({'Year':2019, 'Department':dept, 'Program':program}, {"Year":True, "Total":True}, salaries)
+    allYears = get_all_years({"$and" : [{'Department':dept},{'Program':program}]}, salaries)
+    topTenEmployees = get_top_n_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, allYears, "Total", 10)
+    totalsForYear = get_totals_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, allYears)
     return render_template('programs.html' \
         , program = program \
         , dept = dept \
@@ -163,6 +186,7 @@ def get_employees_by_program(dept, program):
         , avgs = avgs \
         , injuries=injuries \
         , numEmployees = numEmployees \
+        , allYears = allYears \
         , topTenEmployees=topTenEmployees \
         , totalsForYear = totalsForYear)
         

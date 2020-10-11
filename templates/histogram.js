@@ -3,7 +3,6 @@ var histogram = function () {
         , width = window.innerWidth // Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
     var title = "";
-    var xVal = "Total";
     var numBins = 50;
 
     function my(selection) {
@@ -48,15 +47,23 @@ var histogram = function () {
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            svg.append("g")
+                .attr("class", "grid-lines")
+                .call(d3.axisLeft(yScale)
+                    .tickSize(-width)
+                    .tickFormat("")
+                )
+                .call(function (g) { g.select(".domain").remove() });
+
             // X axis
             svg.append("g")
-                .attr("class", "x axis")
+                .attr("class", "xAxis")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(xScale));
 
             // Y axis
             svg.append("g")
-                .attr("class", "y axis")
+                .attr("class", "yAxis")
                 .call(d3.axisLeft(yScale));
 
             svg.selectAll("rect")
@@ -96,7 +103,7 @@ var histogram = function () {
     }
 
     my.xVal = function (value) {
-        if (!arguments.length) return xVal;
+        if (!arguments.length) throw "Error: No value entered for x axis.";
         xVal = value;
         return my;
     }

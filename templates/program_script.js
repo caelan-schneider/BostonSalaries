@@ -2,15 +2,9 @@ var sums = JSON.parse('{{ sums | tojson | safe }}');
 var avgs = JSON.parse('{{ avgs | tojson | safe }}');
 var injuries = JSON.parse('{{ injuries | tojson | safe }}');
 var numEmployees = JSON.parse('{{ numEmployees | tojson | safe }}');
+var years = JSON.parse('{{ allYears }}');
 var topTenEmployees = JSON.parse('{{ topTenEmployees | tojson | safe }}');
 var totalsForYear = JSON.parse('{{ totalsForYear | tojson | safe }}');
-
-console.log(sums);
-console.log(avgs);
-console.log(injuries);
-console.log(numEmployees);
-console.log(topTenEmployees);
-console.log(totalsForYear[0]);
 
 d3.select("#sumtable")
     .datum(sums)
@@ -62,21 +56,46 @@ d3.select("#injurychart")
         .title("NUMBER OF INJURED EMPLOYEES BY YEAR")
         .min(0));
 
-d3.select("#mostPaidEmployees")
-    .datum(topTenEmployees)
-    .call(datatable()
-        .title("TOP TEN MOST PAID EMPLOYEES IN 2019")
-        .dimensions(["First", "Last", "Title"])
-        .measures(["Regular", "Retro", "Overtime", "Injury", "Other", "Total"])
-        .width(1100)
-        .formatFirstColumn(false)
-        .formatLastColumn(true));
+d3.select("#dropdownMenu")
+    .append("select")
+    .attr("id", "dropdown")
+    .selectAll("option")
+    .data(years)
+    .enter().append("option")
+    .attr("value", function (d) { return d })
+    .text(function (d) { return d })
 
-d3.select("#histogram")
-    .datum(totalsForYear)
-    .call(histogram()
-        .title("TOTAL PAY DISTRIBUTION IN 2019")
-        .xVal("Total")
-        .width(1100)
-        .height(400));
+d3.select("#dropdownMenu").select("#dropdown")
+    .on("change", function () {
+        currentYear = document.getElementById("dropdown").value;
+        console.log(currentYear);
+        updateYear(currentYear);
+    }
+    )
+
+function updateYear(year) {
+    d3.selectAll(".forYear").selectAll("*").remove();
+
+    d3.select("#mostPaidEmployees")
+        .attr("class", "forYear")
+        .datum(topTenEmployees[year])
+        .call(datatable()
+            .title("TOP TEN MOST PAID EMPLOYEES IN " + year)
+            .dimensions(["First", "Last", "Title"])
+            .measures(["Regular", "Retro", "Overtime", "Injury", "Other", "Total"])
+            .width(1100)
+            .formatFirstColumn(false)
+            .formatLastColumn(true));
+
+    d3.select("#histogram")
+        .attr("class", "forYear")
+        .datum(totalsForYear[year])
+        .call(histogram()
+            .title("TOTAL PAY DISTRIBUTION IN " + year)
+            .xVal("Total")
+            .width(1100)
+            .height(400));
+};
+
+updateYear(2019);
 

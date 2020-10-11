@@ -61,6 +61,11 @@ svg {
     stroke: #fff;
 }
 
+.unselected {
+    fill: #fff;
+    stroke: #d3d3d3;
+}
+
 .count {
     fill: none;
     stroke: #8e9aaf;
@@ -73,7 +78,7 @@ svg {
 }
 
 body > div {
-    margin: 25px 0px 40px 15%;
+    margin: 25px 0px 40px 5%;
 }
 
 .table-wrapper {
