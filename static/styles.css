@@ -78,8 +78,15 @@ svg {
     fill: #8e9aaf;
 }
 
-body > div {
-    margin: 25px 0px 40px 5%;
+#charts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+#charts > div {
+    margin-bottom: 30px;
 }
 
 .table-wrapper {

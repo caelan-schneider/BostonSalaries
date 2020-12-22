@@ -56,9 +56,19 @@ def get_count_by_year(dic, db, col):
         {"$sort" : {"_id" : 1}}
     ]) 
     docs = [doc for doc in query]
+
     for doc in docs:
         doc["Year"] = doc["_id"]
         doc["_id"] = str(doc["_id"]) + "-" + col + "Count"
+
+    years = get_all_years(dic, db)
+    if len(years) < 2:
+         raise Exception("Not enough data for time series analysis")
+    for year in range(years[-1], years[0]+1):
+        if year not in [doc["Year"] for doc in docs]:
+            docs.append({"Year":year, "count":0})   
+    docs.sort(key=lambda k: k["Year"])
+
     return docs
 
 def get_all_years(dic, db):
@@ -110,8 +120,7 @@ def get_all():
     topTenEmployees = get_top_n_by_year({}, salaries, allYears, "Total", 10)
     totalsForYear = get_totals_by_year({}, salaries, allYears)
     
-    return render_template('cabinets.html' \
-        , dept = "ALL EMPLOYEES" \
+    return render_template('index.html' \
         , sums = sums \
         , avgs = avgs \
         , injuries = injuries \
@@ -139,7 +148,8 @@ def get_employees_by_cabinet(cabinet):
     topTenEmployees = get_top_n_by_year({"Cabinet":cabinet}, salaries, allYears, "Total", 10)
     totalsForYear = get_totals_by_year({"Cabinet":cabinet}, salaries, allYears)
 
-    return render_template('cabinets.html' \
+    return render_template('index.html' \
+        , pageType = "cabinet" \
         , cabinet = cabinet \
         , sums = sums \
         , avgs = avgs \
@@ -161,7 +171,8 @@ def get_employees_by_department(dept):
     topTenEmployees = get_top_n_by_year({"Department":dept}, salaries, allYears, "Total", 10)
     totalsForYear = get_totals_by_year({"Department":dept}, salaries, allYears)
 
-    return render_template('departments.html' \
+    return render_template('index.html' \
+        , pageType = "department" \
         , dept = dept \
         , sums = sums \
         , avgs = avgs \
@@ -182,7 +193,9 @@ def get_employees_by_program(dept, program):
     allYears = get_all_years({"$and" : [{'Department':dept},{'Program':program}]}, salaries)
     topTenEmployees = get_top_n_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, allYears, "Total", 10)
     totalsForYear = get_totals_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, allYears)
-    return render_template('programs.html' \
+
+    return render_template('index.html' \
+        , pageType = "program" \
         , program = program \
         , dept = dept \
         , sums = sums \

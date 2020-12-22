@@ -17,6 +17,7 @@ var timeserieslinechart = function () {
                 max = 0
                 measures.forEach(function (val) {
                     max = Math.max(max, d3.max(data, (d) => d[val]));
+                    max = Math.max(max, 5);
                 })
             }
 
@@ -70,19 +71,22 @@ var timeserieslinechart = function () {
                 .call(d3.axisLeft(yScale)
                     .tickSize(-width)
                     .tickFormat("")
+                    .ticks(Math.min(max, 10))
                 )
                 .call((g) => { g.select(".domain").remove() });
+
+            //Y axis
+            svg.append("g")
+            .attr("class", "yAxis")
+            .call(d3.axisLeft(yScale)
+                .ticks(Math.min(max, 10))
+                );
 
             //X axis
             svg.append("g")
                 .attr("class", "xAxis")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(xScale));
-
-            //Y axis
-            svg.append("g")
-                .attr("class", "yAxis")
-                .call(d3.axisLeft(yScale))
 
             //For each field create a line
             svg.selectAll("#ts-line")
