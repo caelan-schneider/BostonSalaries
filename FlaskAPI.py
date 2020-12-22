@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, render_template
 from flask_pymongo import PyMongo
+import numpy as np
 import simplejson as json
 
 app = Flask(__name__)
@@ -74,11 +75,13 @@ def get_top_n_by_year(dic, db, years, col, n):
         docs[year] = [doc for doc in query]
     return docs
 
+#helper method for API routes
 def get_totals_by_year(dic, db, years):
     docs = {}
     for year in years:
-        query = get_documents({"$and": [dic, {"Year":year}]}, {"Year":True, "Total":True}, db)
-        docs[year] = query
+        query = [doc["Total"] for doc in get_documents({"$and": [dic, {"Year":year}]}, {"Total":True}, db)]
+        h, b = np.histogram(query, bins=20)
+        docs[year] = [{"bin": round(bin, 2), "hist": hist} for bin, hist in zip(b[1:].tolist(), h.tolist())]
     return docs
 
 
@@ -107,7 +110,7 @@ def get_all():
     topTenEmployees = get_top_n_by_year({}, salaries, allYears, "Total", 10)
     totalsForYear = get_totals_by_year({}, salaries, allYears)
     
-    return render_template('departments.html' \
+    return render_template('cabinets.html' \
         , dept = "ALL EMPLOYEES" \
         , sums = sums \
         , avgs = avgs \

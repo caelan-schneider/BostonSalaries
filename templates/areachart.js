@@ -1,14 +1,24 @@
 var areachart = function () {
-    var margin = { top: 20, right:20, bottom: 40, left: 100 }
+    var margin = { top: 20, right: 20, bottom: 40, left: 100 }
         , width = window.innerWidth// Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
-    var title = "";
-    var xVal = "Year";
-    var yVals = ["Regular", "Overtime", "Injury", "Retro", "Other"];
+    var dimension = "Year";
+    var title, measures;
 
     function my(selection) {
         selection.each(function (data) {
+
+            if (Object.is(measures, undefined)) throw ("Must have at least one measure");
+
             width = width - margin.left - margin.right - 155;
+
+            //get max value for autoscaling
+            var max = d3.max(data, function (d) {
+                sum = 0;
+                measures.forEach((val) => { sum += d[val]; })
+                return sum;
+            });
+
             //Parse the year for propery time scaling
             var parseYear = d3.timeParse("%Y");
             data.forEach(function (d) { d.Year = parseYear(d.Year) });
@@ -17,25 +27,13 @@ var areachart = function () {
                 .domain([data[0].Year, data[data.length - 1].Year]) // input
                 .range([2, width]); // output
 
-            //get max value for autoscaling
-            var max = d3.max(data, function (d) {
-                sum = 0;
-                yVals.forEach(
-                    function (val) {
-                        sum += d[val];
-                    }
-                )
-                return sum;
-            });
-
-            var yValsVisible = yVals.slice(0);
-            console.log(yValsVisible);
+            var yValsVisible = measures.slice(0);
 
             var yScale = d3.scaleLinear()
                 .domain([0, max]) // input 
                 .range([height - 1, 0])
                 .nice(); // output 
-            
+
             //Create wrapper
             var chartWrapper = d3.select(this)
                 .append("div")
@@ -44,7 +42,7 @@ var areachart = function () {
             chartWrapper.style("width", width + margin.left + margin.right + 155 + "px");
 
             //Add title
-            if (title != "") {
+            if (!Object.is(title, undefined)) {
                 chartWrapper.append("span")
                     .attr("class", "title")
                     .text(title).append("br");
@@ -58,37 +56,46 @@ var areachart = function () {
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            //chart legend
-            var keys = yVals.reverse();
-            svg.selectAll("#legend-points")
+            //Add horizontal grid lines
+            svg.append("g")
+                .attr("class", "grid-lines")
+                .call(d3.axisLeft(yScale)
+                    .tickSize(-width)
+                    .tickFormat("")
+                )
+                .call((g) => g.select(".domain").remove());
+
+            //Chart legend
+            var keys = measures.reverse();
+            svg.selectAll("#legend-points") // Add points
                 .data(keys)
                 .enter()
                 .append("circle")
                 .attr("r", 7)
-                .attr("class", function (d) { return d.toLowerCase() })
+                .attr("class", (d) => d.toLowerCase())
                 .attr("cx", width + 40)
-                .attr("cy", function (d, i) { return margin.top + i * 20 })
-                .on("click", function (d, i, n) {
+                .attr("cy", (d, i) => margin.top + i * 20)
+                .on("click", (d, i, n) => {
                     svg.selectAll(".layers").remove();
-                    index = yValsVisible.indexOf(d); 
-                    if(index >= 0){
+                    index = yValsVisible.indexOf(d);
+                    if (index >= 0) {
                         yValsVisible.splice(index, 1);
                         d3.select(n[i]).attr("class", "unselected");
                     }
                     else {
                         yValsVisible.push(d);
-                        d3.select(n[i]).attr("class", function(d) {return d.toLowerCase()});
+                        d3.select(n[i]).attr("class", (d) => d.toLowerCase());
                     }
                     update(yValsVisible);
                 });;
 
-            svg.selectAll("#legend-text")
+            svg.selectAll("#legend-text") //Add text
                 .data(keys)
                 .enter()
                 .append("text")
-                .text(function (d) { return d })
+                .text((d) => d)
                 .attr("x", width + 55)
-                .attr("y", function (d, i) { return margin.top + i * 20 + 3.5 })
+                .attr("y", (d, i) => margin.top + i * 20 + 3.5)
                 .attr("font-size", "12px");
 
 
@@ -104,19 +111,21 @@ var areachart = function () {
                 .call(d3.axisLeft(yScale));
 
             function update(cols) {
-            var stackGenerator = d3.stack().keys(cols);
-            var stackedData = stackGenerator(data);
 
-            svg.selectAll(".layers")
-                .data(stackedData)
-                .enter()
-                .append("path")
-                .attr("class", function (d) { return d.key.toLowerCase() + " layers"})
-                .attr("d", d3.area()
-                    .x(function (d) { return xScale(d.data[xVal]) })
-                    .y0(function (d) { return yScale(d[0]) })
-                    .y1(function (d) { return yScale(d[1]) })
-                );
+                //Create stacked area chart
+                var stackGenerator = d3.stack().keys(cols);
+                var stackedData = stackGenerator(data);
+
+                svg.selectAll(".layers")
+                    .data(stackedData)
+                    .enter()
+                    .append("path")
+                    .attr("class", function (d) { return d.key.toLowerCase() + " layers" })
+                    .attr("d", d3.area()
+                        .x((d) => xScale(d.data[dimension]))
+                        .y0((d) => yScale(d[0]))
+                        .y1((d) => yScale(d[1]))
+                    );
             }
             update(yValsVisible);
         });
@@ -146,15 +155,14 @@ var areachart = function () {
         return my;
     }
 
-    my.xVal = function (value) {
-        if (!arguments.length) return xVal;
-        xVal = value;
+    my.dimension = function (value) {
+        if (!arguments.length) return dimension;
+        dimension = value;
         return my;
     }
 
-    my.yVals = function (value) {
-        if (!arguments.length) return yVals;
-        yVals = value;
+    my.measures = function (value) {
+        measures = value;
         return my;
     }
 

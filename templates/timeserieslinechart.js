@@ -1,53 +1,56 @@
 var timeserieslinechart = function () {
     var margin = { top: 20, right: 20, bottom: 40, left: 80 }
-        , width = window.innerWidth// Use the window's width 
+        , width = window.innerWidth // Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
-    var title = "";
-    var xVal = "Year";
-    var yVals = ["Total"];
-
-    var max, min;
+    var dimension = "Year";
+    var max, min, title, measures;
 
     function my(selection) {
         selection.each(function (data) {
+
+            if (Object.is(measures, undefined)) throw ("Must have at least one measure");
+
             width = width - margin.left - margin.right - 55;
-            //get max value for autoscaling
+
+            //get max value of all fields for autoscaling (if one isn't specified)
             if (Object.is(max, undefined)) {
-                //get max value for autoscaling
-                var max = 0
-                yVals.forEach(function (val) {
-                    max = Math.max(max, d3.max(data, function (d) { return d[val] }));
-                    console.log(max);
+                max = 0
+                measures.forEach(function (val) {
+                    max = Math.max(max, d3.max(data, (d) => d[val]));
                 })
             }
 
-            //get min value for autoscaling
+            //get min value of all fields for autoscaling (if one isn't specified)
             if (Object.is(min, undefined)) {
-                min = d3.min(data.map(obj => obj.count));
+                min = Number.POSITIVE_INFINITY
+                measures.forEach(function (val) {
+                    min = Math.min(min, d3.min(data, (d) => d[val]));
+                })
             }
 
             //Parse the year for proper time scaling
             var parseYear = d3.timeParse("%Y");
             data.forEach(function (d) { d.Year = parseYear(d.Year) });
 
+            //Create scale functions to map data to positions in SVG
             var xScale = d3.scaleTime()
-                .domain(d3.extent(data, function (d) { return d[xVal] })) // input
-                .range([2, width]); // output
+                .domain(d3.extent(data, (d) => d[dimension]))
+                .range([2, width]);
 
             var yScale = d3.scaleLinear()
-                .domain([max, min]) // input 
+                .domain([max, min])
                 .range([2, height])
-                .nice(); // output 
+                .nice();
 
-            //Create wrapper
+            //Create wrapper for chart
             var chartWrapper = d3.select(this)
                 .append("div")
                 .attr("class", "chart-wrapper");
 
-            chartWrapper.style("width", width  + margin.left + margin.right + 55 + "px");
+            chartWrapper.style("width", width + margin.left + margin.right + 55 + "px");
 
             //Add title
-            if (title != "") {
+            if (!Object.is(title, undefined)) {
                 chartWrapper.append("span")
                     .attr("class", "title")
                     .text(title).append("br");;
@@ -61,53 +64,54 @@ var timeserieslinechart = function () {
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            //Add horizontal grid lines
             svg.append("g")
                 .attr("class", "grid-lines")
                 .call(d3.axisLeft(yScale)
                     .tickSize(-width)
                     .tickFormat("")
                 )
-                .call(function (g) { g.select(".domain").remove() });
+                .call((g) => { g.select(".domain").remove() });
 
-            // X axis
+            //X axis
             svg.append("g")
                 .attr("class", "xAxis")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(xScale));
 
-            // Y axis
+            //Y axis
             svg.append("g")
                 .attr("class", "yAxis")
                 .call(d3.axisLeft(yScale))
 
+            //For each field create a line
             svg.selectAll("#ts-line")
-                .data(yVals)
+                .data(measures)
                 .enter()
                 .append("path")
                 .each(function (line) {
                     d3.select(this).datum(data)
                         .attr("class", line.toLowerCase())
                         .attr("d", d3.line()
-                            .x(function (d, i) { return xScale(d[xVal]) })
-                            .y(function (d, i) { return yScale(d[line]) }))
+                            .x((d) => xScale(d[dimension]))
+                            .y((d) => yScale(d[line])))
                 });
 
-            //Count points
+            //For each field add points
             svg.selectAll(".categories")
-                .data(yVals)
+                .data(measures)
                 .enter()
                 .append("g")
                 .each(function (line) {
                     pointsClass = line.toLowerCase() + "-points";
-                    console.log(pointsClass);
                     d3.select(this)
                         .selectAll(".points")
                         .data(data)
                         .enter()
                         .append("circle")
                         .attr("class", pointsClass)
-                        .attr("cx", function (d, i) { return xScale(d[xVal]) })
-                        .attr("cy", function (d, i) { return yScale(d[line]) })
+                        .attr("cx", (d) => xScale(d[dimension]))
+                        .attr("cy", (d) => yScale(d[line]))
                         .attr("r", 5);
                 });
         })
@@ -149,15 +153,14 @@ var timeserieslinechart = function () {
         return my;
     }
 
-    my.xVal = function (value) {
-        if (!arguments.length) return xVal;
-        xVal = value;
+    my.dimension = function (value) {
+        if (!arguments.length) return dimension;
+        dimension = value;
         return my;
     }
 
-    my.yVals = function (value) {
-        if (!arguments.length) return yVals;
-        yVals = value;
+    my.measures = function (value) {
+        measures = value;
         return my;
     }
 

@@ -56,9 +56,10 @@ svg {
     stroke: #fff;
 }
 
-.total-points {
+.bar {
     fill: #c86860;
     stroke: #fff;
+    padding: 1px;
 }
 
 .unselected {

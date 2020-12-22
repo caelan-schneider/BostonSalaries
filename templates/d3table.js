@@ -1,32 +1,35 @@
 var datatable = function () {
     var width = 800;
     var height = 400;
-    var title = "";
-    var dimensions = ["Year"]
-    var measures = ["Regular", "Retro", "Overtime", "Injury", "Other", "Total"];
     var formatFirstColumn = true;
     var formatLastColumn = false;
+    var dimensions, measures, title;
 
     function my(selection) {
-
         selection.each(function (data) {
+
+            if (Object.is(dimensions, undefined)) throw ("Must have at least one dimension");
+            if (Object.is(measures, undefined)) throw ("Must have at least one measure");
+
             var allColumns = dimensions.concat(measures);
 
-            //Create table
+            //Create table wrapper
             var tableWrapper = d3.select(this)
                 .append("div")
-                    .attr("class", "table-wrapper");
-                    
+                .attr("class", "table-wrapper");
+
+            //Set width and height
             tableWrapper.style("width", width + "px");
             tableWrapper.style("height", height + "px");
 
             //Add title
-            if (title != "") {
+            if (!Object.is(title, undefined)) {
                 tableWrapper.append("span")
                     .attr("class", "title")
-                    .text(title);
+                    .text(title).append("br");;
             }
-                    
+
+            //Create table
             var table = tableWrapper.append("table");
 
             //Create table header and add column headers
@@ -35,13 +38,15 @@ var datatable = function () {
                 .selectAll("th")
                 .data(allColumns).enter().append("th")
                 .text(function (col) { return col })
-                .attr("class", function(d, i){
-                    if(i == 0 && formatFirstColumn){return "primary-header"}
-                    if (i == allColumns.length -2 && formatLastColumn){return "pre-final-header"}
-                    if (i == allColumns.length -1 && formatLastColumn){return "final-header"}
+                .attr("class", function (d, i) {
+
+                    //Certain headers get classes for special CSS formatting
+                    if (i == 0 && formatFirstColumn) { return "primary-header" }
+                    if (i == allColumns.length - 2 && formatLastColumn) { return "pre-final-header" }
+                    if (i == allColumns.length - 1 && formatLastColumn) { return "final-header" }
                 });
 
-            //Create table body and add correct number of rows based on data
+            //Create table body and add rows
             var body = table.append("tbody");
             var rows = body.selectAll("tr").data(data).enter().append("tr");
 
@@ -53,15 +58,17 @@ var datatable = function () {
                     })
                 }).enter().append('td')
                 .text(function (d) {
-                    //reformat columns representing currency amounts to include commas and two decimal places
+
+                    //Reformat columns representing currency amounts to include commas and two decimal places
                     if (measures.includes(d.column)) { return d.value.toLocaleString('en', { minimumFractionDigits: 2 }); }
                     else { return d.value; }
                 })
                 .attr("class", function (d, i) {
-                    //give class to Year column for special styling
+
+                    //Certain columns get classes for special CSS formatting
                     if (i == 0 && formatFirstColumn) { return "primary-cell" }
-                    if (i == allColumns.length -2 && formatLastColumn){return "pre-final-cell"}
-                    if (i == allColumns.length -1 && formatLastColumn){return "final-cell"}
+                    if (i == allColumns.length - 2 && formatLastColumn) { return "pre-final-cell" }
+                    if (i == allColumns.length - 1 && formatLastColumn) { return "final-cell" }
                 });
         })
     }
@@ -73,24 +80,22 @@ var datatable = function () {
     }
 
     my.dimensions = function (value) {
-        if (!arguments.length) return dimensions;
         dimensions = value;
         return my;
     }
 
     my.measures = function (value) {
-        if (!arguments.length) return measures;
         measures = value;
         return my;
     }
 
-    my.width = function(value) {
+    my.width = function (value) {
         if (!arguments.length) return width;
         width = value;
         return my;
     }
 
-    my.height = function(value) {
+    my.height = function (value) {
         if (!arguments.length) return height;
         height = value;
         return my;
