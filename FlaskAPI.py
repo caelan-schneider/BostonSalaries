@@ -62,13 +62,12 @@ def get_count_by_year(dic, db, col):
         doc["_id"] = str(doc["_id"]) + "-" + col + "Count"
 
     years = get_all_years(dic, db)
-    if len(years) < 2:
-         raise Exception("Not enough data for time series analysis")
-    for year in range(years[-1], years[0]+1):
-        if year not in [doc["Year"] for doc in docs]:
-            docs.append({"Year":year, "count":0})   
-    docs.sort(key=lambda k: k["Year"])
 
+    if len(years) > 0:
+        for year in range(years[-1], years[0]+1):
+            if year not in [doc["Year"] for doc in docs]:
+                docs.append({"Year":year, "count":0})   
+        docs.sort(key=lambda k: k["Year"])
     return docs
 
 def get_all_years(dic, db):
@@ -78,133 +77,134 @@ def get_all_years(dic, db):
     return docs
 
 #helper method for API routes
-def get_top_n_by_year(dic, db, years, col, n):
-    docs = {}
-    for year in years:
-        query = db.find({"$and" : [dic, {"Year":year}]}, {'_id':False}).sort(col, -1).limit(n)
-        docs[year] = [doc for doc in query]
-    return docs
+def get_top_n_for_year(dic, db, year, col, n):
+    query = db.find({"$and" : [dic, {"Year":year}]}, {'_id':False}).sort(col, -1).limit(n)
+    docs = [doc for doc in query]
+    return {"data" : docs}
 
 #helper method for API routes
-def get_totals_by_year(dic, db, years):
-    docs = {}
-    for year in years:
-        query = [doc["Total"] for doc in get_documents({"$and": [dic, {"Year":year}]}, {"Total":True}, db)]
-        h, b = np.histogram(query, bins=20)
-        docs[year] = [{"bin": round(bin, 2), "hist": hist} for bin, hist in zip(b[1:].tolist(), h.tolist())]
-    return docs
-
-
-def get_subgroup_counts(dic, db, group, year):
-    if group not in ("Cabinet", "Department", "Program"):
-        raise ValueError("Input is not a valid group.")
-    query = db.aggregate([
-        {"$match": {"$and" : [{group: {"$exists" : True}}, dic, {"Year": year}]}},
-        {"$group" : {
-            "_id" : "$"+group
-            ,"count": {"$sum" : 1}
-        }},
-        {"$sort" : {"_id" : 1}}
-    ]) 
-    docs = [doc for doc in query]
-    return docs 
+def get_totals_for_year(dic, db, year):
+    query = [doc['Total'] for doc in get_documents({"$and": [dic, {"Year":year}]}, {"Total":True}, db)]
+    h, b = np.histogram(query, bins=20)
+    docs = [{"bin": round(bin, 2), "hist": hist} for bin, hist in zip(b[1:].tolist(), h.tolist())]
+    return {"data" : docs}
 
 @app.route('/')
-def get_all():
+def display_all():
     salaries = mongo.db.salaries
     sums = get_aggregate_by_year({}, salaries, "sum")
     avgs = get_aggregate_by_year({}, salaries, "avg")
     injuries = get_count_by_year({}, salaries, "Injury")
     numEmployees = get_count_by_year({}, salaries, "Total")
     allYears = get_all_years({}, salaries)
-    topTenEmployees = get_top_n_by_year({}, salaries, allYears, "Total", 10)
-    totalsForYear = get_totals_by_year({}, salaries, allYears)
     
     return render_template('index.html' \
         , sums = sums \
         , avgs = avgs \
         , injuries = injuries \
         , numEmployees = numEmployees \
-        , allYears = allYears \
-        , topTenEmployees = topTenEmployees \
-        , totalsForYear = totalsForYear)
+        , allYears = allYears)
+
+
 
 @app.route('/employee/', methods=['GET'])
-def get_employee_by_name():
+def employee_by_name_json():
     salaries = mongo.db.salaries
     first = request.args.get('first')
     last = request.args.get('last')
     return get_documents({'First':first, 'Last':last}, {}, salaries)
 
-@app.route('/cabinet/<cabinet>', methods=['GET'])
-def get_employees_by_cabinet(cabinet):
-    cabinet = cabinet.upper()
+
+
+@app.route('/topnforyear', methods=['GET'])
+def top_n_employees_json():
     salaries = mongo.db.salaries
-    sums = get_aggregate_by_year({'Cabinet':cabinet}, salaries, "sum")
-    avgs = get_aggregate_by_year({'Cabinet':cabinet}, salaries, "avg")
-    injuries = get_count_by_year({"Cabinet":cabinet}, salaries, "Injury")
-    numEmployees = get_count_by_year({"Cabinet":cabinet}, salaries, "Total")
-    allYears = get_all_years({"Cabinet":cabinet}, salaries)
-    topTenEmployees = get_top_n_by_year({"Cabinet":cabinet}, salaries, allYears, "Total", 10)
-    totalsForYear = get_totals_by_year({"Cabinet":cabinet}, salaries, allYears)
+    year = int(request.args.get("forYear", None))
+    pageType = request.args.get("pageType", None)
+    value = request.args.get("value", None)
+    print(pageType)
+    print(value)
+    if pageType == "" and value == "": 
+        return get_top_n_for_year({}, salaries, year, "Total", 10)
+    return get_top_n_for_year({pageType.title() : value}, salaries, year, "Total", 10)
+
+
+
+@app.route('/salaryhistogram', methods=['GET'])
+def salary_histogram_json():
+    salaries = mongo.db.salaries
+    year = int(request.args.get("forYear", None))
+    pageType = request.args.get("pageType", None)
+    value = request.args.get("value", None)
+    print(pageType)
+    print(value)
+    if pageType == "" and value == "": 
+        return get_totals_for_year({}, salaries, year)
+    return get_totals_for_year({pageType.title() : value}, salaries, year)
+
+
+
+@app.route('/cabinet/<cabinet>', methods=['GET'])
+def display_employees_by_cabinet(cabinet):
+    value = cabinet.upper()
+    salaries = mongo.db.salaries
+    sums = get_aggregate_by_year({'Cabinet':value}, salaries, "sum")
+    avgs = get_aggregate_by_year({'Cabinet':value}, salaries, "avg")
+    injuries = get_count_by_year({"Cabinet":value}, salaries, "Injury")
+    numEmployees = get_count_by_year({"Cabinet":value}, salaries, "Total")
+    allYears = get_all_years({"Cabinet":value}, salaries)
 
     return render_template('index.html' \
         , pageType = "cabinet" \
-        , cabinet = cabinet \
+        , value = value \
         , sums = sums \
         , avgs = avgs \
         , injuries=injuries \
         , numEmployees = numEmployees \
-        , allYears = allYears \
-        , topTenEmployees=topTenEmployees \
-        , totalsForYear = totalsForYear)
+        , allYears = allYears)
+
+
 
 @app.route('/department/<dept>', methods=['GET'])
-def get_employees_by_department(dept):
-    dept = dept.upper()
+def display_employees_by_department(dept):
+    value = dept.upper()
     salaries = mongo.db.salaries
-    sums = get_aggregate_by_year({'Department':dept}, salaries, "sum")
-    avgs = get_aggregate_by_year({'Department':dept}, salaries, "avg")
-    injuries = get_count_by_year({"Department": dept}, salaries, "Injury")
-    numEmployees = get_count_by_year({"Department": dept}, salaries, "Total")
-    allYears = get_all_years({"Department":dept}, salaries)
-    topTenEmployees = get_top_n_by_year({"Department":dept}, salaries, allYears, "Total", 10)
-    totalsForYear = get_totals_by_year({"Department":dept}, salaries, allYears)
+    sums = get_aggregate_by_year({'Department':value}, salaries, "sum")
+    avgs = get_aggregate_by_year({'Department':value}, salaries, "avg")
+    injuries = get_count_by_year({"Department": value}, salaries, "Injury")
+    numEmployees = get_count_by_year({"Department": value}, salaries, "Total")
+    allYears = get_all_years({"Department":value}, salaries)
 
     return render_template('index.html' \
         , pageType = "department" \
-        , dept = dept \
+        , value = value \
         , sums = sums \
         , avgs = avgs \
         , injuries=injuries \
         , numEmployees = numEmployees \
-        , allYears = allYears \
-        , topTenEmployees=topTenEmployees \
-        , totalsForYear = totalsForYear)
+        , allYears = allYears)
+
+
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
-def get_employees_by_program(dept, program):
-    program = program.upper()
+def display_employees_by_program(dept, program):
+    value = program.upper()
     salaries = mongo.db.salaries
-    sums = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "sum")
-    avgs = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "avg")
-    injuries = get_count_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Injury")
-    numEmployees = get_count_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, "Total")
-    allYears = get_all_years({"$and" : [{'Department':dept},{'Program':program}]}, salaries)
-    topTenEmployees = get_top_n_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, allYears, "Total", 10)
-    totalsForYear = get_totals_by_year({"$and" : [{'Department':dept},{'Program':program}]}, salaries, allYears)
+    sums = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':value}]}, salaries, "sum")
+    avgs = get_aggregate_by_year({"$and" : [{'Department':dept},{'Program':value}]}, salaries, "avg")
+    injuries = get_count_by_year({"$and" : [{'Department':dept},{'Program':value}]}, salaries, "Injury")
+    numEmployees = get_count_by_year({"$and" : [{'Department':dept},{'Program':value}]}, salaries, "Total")
+    allYears = get_all_years({"$and" : [{'Department':dept},{'Program':value}]}, salaries)
 
     return render_template('index.html' \
         , pageType = "program" \
-        , program = program \
+        , value = value \
         , dept = dept \
         , sums = sums \
         , avgs = avgs \
         , injuries=injuries \
         , numEmployees = numEmployees \
-        , allYears = allYears \
-        , topTenEmployees=topTenEmployees \
-        , totalsForYear = totalsForYear)
+        , allYears = allYears)
         
 
 if __name__ == '__main__':
