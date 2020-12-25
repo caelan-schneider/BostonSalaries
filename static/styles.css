@@ -1,20 +1,32 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
+    background-color: #f6f2ee;
+}
+
+#inner-header > h2 {
+    font: Palatino, serif;
+    font-style: bold;
+    color: 	#8e9aaf;
+}
+
+nav {
+    box-shadow: 0px 2px 6px -2px #888888;
+}
+
+#main-dropdown {
     background-color: #f8f8f8;
 }
 
-#header > h1 {
-    font: Palatino, serif;
-    color: #8e9aaf;
+#header-dropdowns {
+    margin: 10px 0px;
 }
 
-#header > h4 {
-    font-style: italic;
-    color: #A9A9A9;
+#main-dropdown {
+    margin-right: 5px;
 }
 
-#header {
-    margin-bottom: 30px;
+#secondary-dropdown {
+    margin-right: 10px;
 }
 
 .line {
@@ -52,12 +64,12 @@ svg {
 }
 
 .total {
-    fill: #c86860;
+    fill:  #ef8f8f;
     stroke: #fff;
 }
 
 .bar {
-    fill: #c86860;
+    fill:  #ef8f8f;
     stroke: #fff;
     padding: 1px;
 }
@@ -69,40 +81,43 @@ svg {
 
 .count {
     fill: none;
-    stroke: #8e9aaf;
+    stroke:  	#8e9aaf;
     stroke-width: 3;
 }
 
 .count-points {
     stroke: #fff;
-    fill: #8e9aaf;
+    fill:  	#8e9aaf;
 }
 
 #charts {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 30px;
+    margin-top: 50px;
 }
 
 #charts > div {
-    margin-bottom: 30px;
+    margin-bottom: 50px;
 }
 
 .table-wrapper {
     overflow-x: auto;
     overflow-y: auto;
-    /* border: 1px solid #D3D3D3; */
+    /* border: 1px solid 		#888888;  */
     border-radius: 5px;
-    box-shadow: 0px 2px 6px -2px #a2a2a2;
+    background-color: #fff;
+    box-shadow: 0px 2px 6px -2px #888888;
 }
 
 .chart-wrapper {
     padding-top: 5px;
-    /* border: 1px solid #D3D3D3; */
+    /* border: 1px solid		#888888;  */
     border-radius: 5px;
     background-color: #fff;
-    box-shadow: 0px 2px 6px -2px #a2a2a2;}
+    box-shadow: 0px 2px 6px -2px #888888;
+
+}
 
 table {
     border-collapse: separate; 
@@ -125,7 +140,7 @@ th {
     position: sticky;
     top: 3em;
     color: white;
-    background-color: #D9ADAD;
+    background-color:  #D9ADAD;
     padding: 0.5em 3em 0.5em 1.5em;
 }
 
