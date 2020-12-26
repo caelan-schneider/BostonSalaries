@@ -76,6 +76,15 @@ def get_all_unique(dic, db, col, is_desc=False):
     docs.sort(reverse=is_desc)
     return docs
 
+def get_unique_pairs(dic, db, col1, col2, is_desc=False):
+    query = [{
+        "$group": {
+        "_id": {col1: "$" + col1, col2: "$" + col2}
+   }}]
+    docs = [doc["_id"] for doc in db.aggregate(query) if len(doc["_id"]) == 2]
+    docs.sort(key=lambda k: k[col1] + k[col2], reverse=is_desc)
+    return docs
+
 #helper method for API routes
 def get_top_n_for_year(dic, db, year, col, n):
     query = db.find({"$and" : [dic, {"Year":year}]}, {'_id':False}).sort(col, -1).limit(n)
@@ -148,18 +157,11 @@ def salary_histogram_json():
 def division_options_json():
     salaries = mongo.db.salaries
     selected = request.args.get("selected", None)
+    if selected == "Program":
+        return {"options": [k["Department"] + " - " + k["Program"] for k in get_unique_pairs({}, salaries, "Department", "Program")]}
     if selected not in ("Department", "Cabinet"):
         return {"options":[]}
     return {"options":get_all_unique({}, salaries, selected)}
-
-
-
-@app.route('/programoptions', methods=['GET'])
-def program_options_json():
-    salaries = mongo.db.salaries
-    selected = request.args.get("selected", None)
-    options = get_all_unique({"Department":selected}, salaries, "Program")
-    return {"options": options}
 
 
 

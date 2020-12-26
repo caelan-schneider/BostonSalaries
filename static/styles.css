@@ -3,30 +3,64 @@ body {
     background-color: #f6f2ee;
 }
 
-#inner-header > h2 {
-    font: Palatino, serif;
-    font-style: bold;
-    color: 	#8e9aaf;
-}
-
 nav {
     box-shadow: 0px 2px 6px -2px #888888;
 }
 
-#main-dropdown {
-    background-color: #f8f8f8;
+.navbar-center {
+    margin: 0 auto;
+
 }
 
 #header-dropdowns {
-    margin: 10px 0px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+*,*:focus,*:hover{
+    outline:none;
 }
 
 #main-dropdown {
-    margin-right: 5px;
+    background-color: #f8f8f8;
+    font-size: 15px;
+    width: 150px;
+    height: 35px;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    border: 1px solid lightgray;
+    border-right: 0px;
+    margin-right: -5px;
+    vertical-align: top;
+    padding-left: 5px;
 }
 
 #secondary-dropdown {
-    margin-right: 10px;
+    color: #212529;
+    width: 550px;
+    font-size: 13px;
+    height: 35px;
+    vertical-align: top;
+    padding-left: 5px;
+    border: 1px solid lightgray;
+    border-right: 0px;
+}
+
+#dropdown-button {
+    height: 35px;
+    width: 50px;
+    font-size: 20px;
+    border: 1px solid lightgray;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+    background-color: #f8f8f8; 
+}
+
+i {
+    color: #707070;
+    vertical-align: top;
 }
 
 .line {
@@ -104,7 +138,6 @@ svg {
 .table-wrapper {
     overflow-x: auto;
     overflow-y: auto;
-    /* border: 1px solid 		#888888;  */
     border-radius: 5px;
     background-color: #fff;
     box-shadow: 0px 2px 6px -2px #888888;
@@ -112,7 +145,6 @@ svg {
 
 .chart-wrapper {
     padding-top: 5px;
-    /* border: 1px solid		#888888;  */
     border-radius: 5px;
     background-color: #fff;
     box-shadow: 0px 2px 6px -2px #888888;
@@ -177,12 +209,6 @@ tr:nth-child(odd) {
     /* position: sticky;
     right: 0px; */
 }
-
-/* .finalHeader {
-    position: sticky;
-    top: 3em;
-    right: 0;
-}  */
 
 .title {
     font-style: Arial;
