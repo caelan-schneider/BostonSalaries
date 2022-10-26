@@ -76,6 +76,7 @@ def get_all_unique(dic, db, col, is_desc=False):
     docs.sort(reverse=is_desc)
     return docs
 
+#helper method for API routes
 def get_unique_pairs(dic, db, col1, col2, is_desc=False):
     query = [{
         "$group": {
@@ -125,7 +126,7 @@ def employee_by_name_json():
     salaries = mongo.db.salaries
     first = request.args.get('first')
     last = request.args.get('last')
-    return get_documents({'First':first, 'Last':last}, {}, salaries)
+    return jsonify(get_documents({'First':first, 'Last':last}, {}, salaries))
 
 
 

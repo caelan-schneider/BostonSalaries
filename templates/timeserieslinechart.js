@@ -77,9 +77,9 @@ var timeserieslinechart = function () {
 
             //Y axis
             svg.append("g")
-            .attr("class", "yAxis")
-            .call(d3.axisLeft(yScale)
-                .ticks(Math.min(max, 10))
+                .attr("class", "yAxis")
+                .call(d3.axisLeft(yScale)
+                    .ticks(Math.min(max, 10))
                 );
 
             //X axis
@@ -107,7 +107,8 @@ var timeserieslinechart = function () {
                 .enter()
                 .append("g")
                 .each(function (line) {
-                    pointsClass = line.toLowerCase() + "-points";
+                    pointsClass = "p-" + line.toLowerCase();
+                    hoverClass = "h-" + line.toLowerCase();
                     d3.select(this)
                         .selectAll(".points")
                         .data(data)
@@ -118,7 +119,56 @@ var timeserieslinechart = function () {
                         .attr("cy", (d) => yScale(d[line]))
                         .attr("r", 5);
                 });
-        })
+
+            var voronoi = d3.voronoi()
+                .x((d) => xScale(d[dimension]))
+                .y((d) => yScale(d[measures[0]]))
+                .size(width, height)(data);
+
+            const voronoiRadius = width / 10;
+
+            svg.append('circle')
+                .attr('class', 'highlight-circle')
+                .attr('r', 7) // slightly larger than our points
+                .style('fill', 'none')
+                .style('display', 'none');
+
+            // callback to highlight a point
+            function highlight(d) {
+                // no point to highlight - hide the circle
+                if (!d) {
+                    d3.select('.highlight-circle').style('display', 'none');
+
+                    // otherwise, show the highlight circle at the correct position
+                } else {
+                    d3.select('.highlight-circle')
+                        .style('display', '')
+                        .style('stroke', "blue")
+                        .attr('cx', xScale(d[dimension]))
+                        .attr('cy', yScale(d[measures[0]]));
+                }
+            }
+
+            // callback for when the mouse moves across the overlay
+            function mouseMoveHandler() {
+                // get the current mouse position
+                const [mx, my] = d3.mouse(this);
+
+                // use the new diagram.find() function to find the Voronoi site
+                // closest to the mouse, limited by max distance voronoiRadius
+                const site = voronoi.find(mx, my, voronoiRadius);
+
+                // highlight the point if we found one
+                highlight(site && site.data);
+            }
+
+            svg.on('mousemove', mouseMoveHandler)
+            .on('mouseleave', () => {
+              // hide the highlight circle when the mouse leaves the chart
+              highlight(null);
+            });
+
+        });
     }
 
     my.title = function (value) {
