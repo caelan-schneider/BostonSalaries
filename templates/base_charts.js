@@ -1,7 +1,7 @@
-var sums = JSON.parse('{{ sums | tojson | safe }}');
-var avgs = JSON.parse('{{ avgs | tojson | safe }}');
-var injuries = JSON.parse('{{ injuries | tojson | safe }}');
-var numEmployees = JSON.parse('{{ numEmployees | tojson | safe }}');
+var sums = JSON.parse('{{ sums_by_year | tojson | safe }}');
+var avgs = JSON.parse('{{ avgs_by_year | tojson | safe }}');
+var injuries = JSON.parse('{{ injured_employees_by_year | tojson | safe }}');
+var numEmployees = JSON.parse('{{ employees_by_year | tojson | safe }}');
 var value = "{{value}}";
 var pathRoot = "{{pathRoot}}";
 

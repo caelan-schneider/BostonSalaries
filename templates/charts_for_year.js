@@ -1,5 +1,5 @@
 
-var years = JSON.parse("{{ allYears }}");
+var years = JSON.parse("{{ years }}");
 var pageType = "{{pageType}}";
 var value = "{{value}}";
 
