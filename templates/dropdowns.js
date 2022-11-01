@@ -1,13 +1,13 @@
-var pathRoot = '{{pathRoot}}'
-var pageType = '{{pageType}}';
+var pathRoot = '{{path_root}}'
+var pageType = '{{page_type}}';
 
 d3.select("#main-dropdown")
     .on("change", function () {
         division = document.getElementById("main-dropdown").value;
-        SecondaryDropdown(division)
+        secondaryDropdown(division)
     })
 
-function DisplaySecondary(data, division) {
+function displaySecondary(data, division) {
     d3.select("#secondary-dropdown-input").remove();
     d3.select("#secondary-dropdown").remove();
     d3.select("#dropdown-button").remove();
@@ -21,8 +21,7 @@ function DisplaySecondary(data, division) {
 
         d3.select("#header-dropdowns")
             .append("datalist")
-            .attr("id", "secondary-dropdown")
-            .style("width", "600px");
+            .attr("id", "secondary-dropdown");
 
         var value = document.getElementById("secondary-dropdown");
 
@@ -48,12 +47,12 @@ function DisplaySecondary(data, division) {
     }
 }
 
-function SecondaryDropdown(selected) {
+function secondaryDropdown(selected) {
     $.get('/divisionoptions', {
         selected: selected
     }).done(
         function (response) {
-            DisplaySecondary(response, selected);
+            displaySecondary(response, selected);
         });
 }
 
@@ -74,4 +73,4 @@ function updateSearch(division) {
 
 }
 
-SecondaryDropdown("Department");
+secondaryDropdown("Department");

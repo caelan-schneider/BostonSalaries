@@ -40,7 +40,7 @@ nav {
     width: 600px;
     font-size: 13px;
     height: 35px;
-    vertical-align: top;
+    /* vertical-align: top; */
     padding-left: 5px;
     border: 1px solid lightgray;
     border-right: 0px;
@@ -115,7 +115,7 @@ svg {
 
 .count {
     fill: none;
-    stroke:  	#8e9aaf;
+    stroke:#8e9aaf;
     stroke-width: 3;
 }
 

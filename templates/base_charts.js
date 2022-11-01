@@ -3,11 +3,11 @@ var avgs = JSON.parse('{{ avgs_by_year | tojson | safe }}');
 var injuries = JSON.parse('{{ injured_employees_by_year | tojson | safe }}');
 var numEmployees = JSON.parse('{{ employees_by_year | tojson | safe }}');
 var value = "{{value}}";
-var pathRoot = "{{pathRoot}}";
+var pathRoot = "{{path_root}}";
 
-d3.select("#sumtable")
+d3.select("#total-pay-table")
     .datum(sums)
-    .call(datatable()
+    .call(dataTable()
         .title("Total Salaries Paid by Year")
         .width(1100)
         .dimensions(["Year"])
@@ -15,17 +15,17 @@ d3.select("#sumtable")
         .formatFirstColumn(true)
         .formatLastColumn(true));
 
-d3.select("#sumchart")
+d3.select("#total-pay-chart")
     .datum(sums)
-    .call(areachart()
+    .call(areaChart()
         .title("Total Salaries Paid by Year")
         .measures(["Regular", "Retro", "Injury", "Overtime", "Other"])
         .width(1100)
         .height(350));
 
-d3.select("#avgtable")
+d3.select("#avg-pay-table")
     .datum(avgs)
-    .call(datatable()
+    .call(dataTable()
         .title("Average Pay by Year")
         .dimensions(["Year"])
         .measures(["Regular", "Retro", "Overtime", "Injury", "Other", "Total"])
@@ -33,17 +33,17 @@ d3.select("#avgtable")
         .formatLastColumn(true)
         .width(1100));
 
-d3.select("#avgchart")
+d3.select("#avg-pay-chart")
     .datum(avgs)
-    .call(areachart()
+    .call(areaChart()
         .title("Average Pay by Year")
         .measures(["Regular", "Retro", "Injury", "Overtime", "Other"])
         .width(1100)
         .height(350));
 
-d3.select("#countschart")
+d3.select("#employees-chart")
     .datum(numEmployees)
-    .call(timeserieslinechart()
+    .call(timeSeriesLineChart()
         .dimension("Year")
         .measures(["count"])
         .min(0)
@@ -51,9 +51,9 @@ d3.select("#countschart")
         .height(200)
         .title("Total Number of Employees by Year"));
 
-d3.select("#injurychart")
+d3.select("#injuries-chart")
     .datum(injuries)
-    .call(timeserieslinechart()
+    .call(timeSeriesLineChart()
         .dimension("Year")
         .measures(["count"])
         .width(1100)

@@ -51,8 +51,8 @@ class MongoCollection:
         return docs
 
     #return pivot dictionary on specified columns with given aggregation function and group by
-    def pivot(self, filter, agg_type, group_by, pivot_fields, round_by=2):
-        group = {field: {"$"+agg_type: "$"+field} for field in pivot_fields}
+    def pivot(self, filter, agg, group_by, pivot_on, round_by=2):
+        group = {field: {"$"+agg: "$"+field} for field in pivot_on}
         group["_id"] = "$" + group_by
         query = self.collection.aggregate([
             {"$match" : filter},
@@ -64,10 +64,10 @@ class MongoCollection:
             for k, v in doc.items():
                 doc[k] = round(v, round_by)
             doc[group_by] = doc["_id"]
-            doc["_id"] = str(doc["_id"]) + "-" + agg_type
+            doc["_id"] = str(doc["_id"]) + "-" + agg
 
         if group_by == "Year":
-            return MongoCollection._impute_missing_years(docs, pivot_fields) 
+            return MongoCollection._impute_missing_years(docs, pivot_on) 
         return docs
 
     #count the instances of given field after filtering, optionally grouped by another field

@@ -1,4 +1,4 @@
-var barchart = function () {
+var barChart = function () {
     var margin = { top: 20, right: 20, bottom: 50, left: 80 }
         , width = window.innerWidth// Use the window's width 
         , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height

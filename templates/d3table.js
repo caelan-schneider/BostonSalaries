@@ -1,4 +1,4 @@
-var datatable = function () {
+var dataTable = function () {
     var width = 800;
     var height = 400;
     var formatFirstColumn = true;

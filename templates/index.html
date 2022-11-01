@@ -25,7 +25,7 @@
             Boston Employee Earnings
         </span>
         <span class="navbar-text">
-            {% if pageType %}
+            {% if page_type %}
             <span id="subtitle">{{value}}</span>
             {% else %}
             <span id="subtitle">CITY OF BOSTON</span>
@@ -49,16 +49,15 @@
     </nav>
 
     <div id="charts">
-        <div id="sumtable"></div>
-        <div id="sumchart"></div>
-        <div id="avgtable"></div>
-        <div id="avgchart"></div>
-        <div id="countschart"></div>
-        <div id="injurychart"></div>
+        <div id="total-pay-table"></div>
+        <div id="total-pay-chart"></div>
+        <div id="avg-pay-table"></div>
+        <div id="avg-pay-chart"></div>
+        <div id="employees-chart"></div>
+        <div id="injuries-chart"></div>
         <div id="years-dropdown"></div>
-        <div id="mostPaidEmployees"></div>
-        <div id="histogram"></div>
-        <div id="map"></div>
+        <div id="most-paid-employees-table"></div>
+        <div id="pay-histogram"></div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

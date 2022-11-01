@@ -1,6 +1,6 @@
 
-var years = JSON.parse("{{ years }}");
-var pageType = "{{pageType}}";
+var years = JSON.parse("{{years}}");
+var pageType = "{{page_type}}";
 var value = "{{value}}";
 
 //Create dropdown menu
@@ -19,42 +19,42 @@ d3.select("#years-dropdown")
 d3.select("#years-dropdown").select("#dropdown")
     .on("change", function () {
         currentYear = parseInt(document.getElementById("dropdown").value);
-        TopNForYear(currentYear);
-        SalaryHistogram(currentYear);
+        topNForYear(currentYear);
+        salaryHistogram(currentYear);
     })
 
-function DisplayTopNForYear(data, year){
-    d3.select("#mostPaidEmployees").selectAll("*").remove();
+function displayTopNForYear(data, year){
+    d3.select("#most-paid-employees-table").selectAll("*").remove();
 
-    let employeedims = ["First", "Last"]
-    if(!pageType) employeedims[2] = "Department";
-    if(pageType == "department") employeedims[2] = "Program";
-    if(pageType == "cabinet") employeedims[2] = "Department";
-    employeedims.push("Title");
+    let employeeDims = ["First", "Last"]
+    if(!pageType) employeeDims[2] = "Department";
+    if(pageType == "department") employeeDims[2] = "Program";
+    if(pageType == "cabinet") employeeDims[2] = "Department";
+    employeeDims.push("Title");
 
-    d3.select("#mostPaidEmployees")
+    d3.select("#most-paid-employees-table")
         .datum(data)
-        .call(datatable()
+        .call(dataTable()
             .title("Top Ten Most Paid Employees in " + year)
-            .dimensions(employeedims)
+            .dimensions(employeeDims)
             .measures(["Regular", "Retro", "Overtime", "Injury", "Other", "Total"])
             .width(1100)
             .formatFirstColumn(false)
             .formatLastColumn(true));
 }
 
-function TopNForYear(year) {
-    $.get('/topnforyear', {
+function topNForYear(year) {
+    $.get('/top-n-for-year', {
         forYear: year, pageType: pageType, value: value}).done(
-            (response) => DisplayTopNForYear(response["data"], year));
+            (response) => displayTopNForYear(response["data"], year));
     }
 
-function DisplaySalaryHistogram(data, year) {
-    d3.select("#histogram").selectAll("*").remove();
+function displaySalaryHistogram(data, year) {
+    d3.select("#pay-histogram").selectAll("*").remove();
 
-    d3.select("#histogram")
+    d3.select("#pay-histogram")
         .datum(data)
-        .call(barchart()
+        .call(barChart()
             .title("Total Pay Distribution in " + year)
             .dimension("bin")
             .measure("hist")
@@ -62,13 +62,13 @@ function DisplaySalaryHistogram(data, year) {
             .height(350));
 };
 
-function SalaryHistogram(year) {
-    $.get('/salaryhistogram', {
+function salaryHistogram(year) {
+    $.get('/salary-histogram', {
         forYear: year, pageType: pageType, value: value}).done(
-            (response) => DisplaySalaryHistogram(response["data"], year));
+            (response) => displaySalaryHistogram(response["data"], year));
     }
 
-TopNForYear(years[0]);
-SalaryHistogram(years[0]);
+topNForYear(years[0]);
+salaryHistogram(years[0]);
 
 
