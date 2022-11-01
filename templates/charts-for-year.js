@@ -1,7 +1,7 @@
 
 var years = JSON.parse("{{years}}");
-var pageType = "{{page_type}}";
-var value = "{{value}}";
+var divisionType = "{{division_type}}";
+var divisionValue = "{{division_value}}";
 
 //Create dropdown menu
 d3.select("#years-dropdown")
@@ -27,9 +27,9 @@ function displayTopNForYear(data, year){
     d3.select("#most-paid-employees-table").selectAll("*").remove();
 
     let employeeDims = ["First", "Last"]
-    if(!pageType) employeeDims[2] = "Department";
-    if(pageType == "department") employeeDims[2] = "Program";
-    if(pageType == "cabinet") employeeDims[2] = "Department";
+    if(!divisionType) employeeDims[2] = "Department";
+    if(divisionType == "department") employeeDims[2] = "Program";
+    if(divisionType == "cabinet") employeeDims[2] = "Department";
     employeeDims.push("Title");
 
     d3.select("#most-paid-employees-table")
@@ -45,7 +45,7 @@ function displayTopNForYear(data, year){
 
 function topNForYear(year) {
     $.get('/top-n-for-year', {
-        forYear: year, pageType: pageType, value: value}).done(
+        forYear: year, divisionType: divisionType, divisionValue: divisionValue}).done(
             (response) => displayTopNForYear(response["data"], year));
     }
 
@@ -64,7 +64,7 @@ function displaySalaryHistogram(data, year) {
 
 function salaryHistogram(year) {
     $.get('/salary-histogram', {
-        forYear: year, pageType: pageType, value: value}).done(
+        forYear: year, divisionType: divisionType, divisionValue: divisionValue}).done(
             (response) => displaySalaryHistogram(response["data"], year));
     }
 

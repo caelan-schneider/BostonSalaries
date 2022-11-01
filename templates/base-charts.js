@@ -2,7 +2,7 @@ var sums = JSON.parse('{{ sums_by_year | tojson | safe }}');
 var avgs = JSON.parse('{{ avgs_by_year | tojson | safe }}');
 var injuries = JSON.parse('{{ injured_employees_by_year | tojson | safe }}');
 var numEmployees = JSON.parse('{{ employees_by_year | tojson | safe }}');
-var value = "{{value}}";
+var divisionValue = "{{division_value}}";
 var pathRoot = "{{path_root}}";
 
 d3.select("#total-pay-table")
