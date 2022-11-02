@@ -9,6 +9,7 @@ var timeSeriesLineChart = function () {
         selection.each(function (data) {
 
             if (Object.is(measures, undefined)) throw ("Must have at least one measure");
+            if (data.length == 0) throw ("Data is empty!")
 
             width = width - margin.left - margin.right - 55;
 

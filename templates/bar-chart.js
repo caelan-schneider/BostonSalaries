@@ -9,6 +9,7 @@ var barChart = function () {
 
             if (Object.is(dimension, undefined)) throw ("Must have at least one dimension");
             if (Object.is(measure, undefined)) throw ("Must have at least one measure");
+            if (data.length == 0) throw ("Data is empty!")
 
             width = width - margin.left - margin.right - 55;
 

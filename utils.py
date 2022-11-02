@@ -31,16 +31,17 @@ class MongoCollection:
             
         return docs
 
-  
     #return list of documents after filtering that match projection schema
-    def get_documents(self, filter: Dict, projection: Dict):
-        projection["_id"] = False
-        return [doc for doc in self.collection.find(filter, projection)]
+    def get_documents(self, filter: Dict, projection: Dict = {}):
+        projection["_id"] = 0
+        docs = [doc for doc in self.collection.find(filter, projection)]
+        print(docs)
+        return docs
 
     #return sorted list of distinct values for given dimension after filtering
     def unique_values(self, filter: Dict, field: str, is_desc: bool = False):
         query = self.collection.distinct(field, filter)
-        docs = [doc for doc in query]
+        docs = [doc for doc in query if doc is not None]
         docs.sort(reverse=is_desc)
         return docs
 
@@ -56,6 +57,8 @@ class MongoCollection:
 
     #return pivot dictionary on specified columns with given aggregation function and group by
     def pivot(self, filter, agg: str, group_by: str, pivot_on: List[str], round_by: int = 2):
+        if group_by in pivot_on:
+            raise ValueError(f"group_by {group_by} cannot be in pivot_on list")
         group = {field: {"$"+agg: "$"+field} for field in pivot_on}
         group["_id"] = "$" + group_by
         query = self.collection.aggregate([
@@ -66,7 +69,11 @@ class MongoCollection:
         docs = [doc for doc in query]
         for doc in docs:
             for k, v in doc.items():
-                doc[k] = round(v, round_by)
+                try:
+                    doc[k] = round(v, round_by)
+                except Exception as err:
+                    print(err)
+                    raise ValueError(f"Invalid key/value pair in document: key:{k} value:{v}.")
             doc[group_by] = doc["_id"]
             doc["_id"] = str(doc["_id"]) + "-" + agg
 
@@ -92,6 +99,7 @@ class MongoCollection:
             for doc in docs:
                 doc[group_by] = doc["_id"]
                 doc["_id"] = str(doc["_id"]) + "-" + field + "Count"
+          
 
             if group_by == "Year":
                 docs = MongoCollection._impute_missing_years(docs, ["count"])
@@ -108,7 +116,7 @@ class MongoCollection:
 
     #returns histogram of given field with given number of bins after applying given filter
     def histogram(self, filter: Dict, field: str, num_bins: int = 15, round_by: int = 2):
-        data = [doc[field] for doc in self.get_documents(filter, {field:True})]
+        data = [doc[field] for doc in self.get_documents(filter, {field:True}) if field in doc.keys()]
         h, b = np.histogram(data, bins=num_bins)
         docs = [{"bin": round(bin, round_by), "hist": hist} for bin, hist in zip(b[1:].tolist(), h.tolist())]
         return docs

@@ -41,6 +41,7 @@ d3.select("#avg-pay-chart")
         .width(1100)
         .height(350));
 
+
 d3.select("#employees-chart")
     .datum(numEmployees)
     .call(timeSeriesLineChart()

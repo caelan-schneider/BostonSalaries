@@ -10,6 +10,7 @@ var dataTable = function () {
 
             if (Object.is(dimensions, undefined)) throw ("Must have at least one dimension");
             if (Object.is(measures, undefined)) throw ("Must have at least one measure");
+            if (data.length == 0) throw ("Data is empty!")
 
             var allColumns = dimensions.concat(measures);
 
@@ -60,7 +61,15 @@ var dataTable = function () {
                 .text(function (d) {
 
                     //Reformat columns representing currency amounts to include commas and two decimal places
-                    if (measures.includes(d.column)) { return d.value.toLocaleString('en', { minimumFractionDigits: 2 }); }
+                    if (measures.includes(d.column)) { 
+                        try{
+                            return d.value.toLocaleString('en', { minimumFractionDigits: 2 }); 
+                        }
+                        catch (error){
+                            console.log(d)
+                            console.error(error);
+                        }
+                    }
                     else { return d.value; }
                 })
                 .attr("class", function (d, i) {

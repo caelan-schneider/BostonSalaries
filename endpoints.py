@@ -5,6 +5,9 @@ app = Flask(__name__)
 common_pivots = ["Regular", "Retro", "Overtime", "Injury", "Other", "Total"]
 salaries = MongoCollection(app, db_name="boston_salaries", collection_name="salaries")
 
+cabinets = salaries.unique_values(filter={}, field="Cabinet")
+departments = salaries.unique_values(filter={}, field="Department")
+programs = salaries.unique_values(filter={}, field="Program")
 
 @app.route('/')
 def display_all(): 
@@ -22,12 +25,18 @@ def display_all():
         , employees_by_year = employees_by_year \
         , years = years)
 
+@app.errorhandler(404)
+def page_not_found(error):
+   return render_template('404.html', title = '404'), 404
 
 @app.route('/employee/', methods=['GET'])
 def employee_by_name_json():
     first = request.args.get('first')
     last = request.args.get('last')
-    return jsonify(salaries.get_documents(filter={'First':first, 'Last':last}, projection={}))
+    docs = salaries.get_documents(filter={'First':first, 'Last':last})
+    if len(docs) == 0:
+        return page_not_found(f"No record of employee with name {first} {last}")
+    return jsonify(docs)
 
 
 @app.route('/top-n-for-year', methods=['GET'])
@@ -62,6 +71,9 @@ def division_options_json():
 
 @app.route('/cabinet/<cabinet>', methods=['GET'])
 def display_employees_by_cabinet(cabinet):
+    if cabinet not in cabinets:
+        return page_not_found(f"{cabinet} is not a valid cabinet")
+
     cabinet = cabinet.upper()
     sums_by_year = salaries.pivot(filter={'Cabinet': cabinet}, agg="sum", group_by="Year", pivot_on=common_pivots)
     avgs_by_year = salaries.pivot(filter={'Cabinet': cabinet}, agg="avg", group_by="Year", pivot_on=common_pivots)
@@ -82,6 +94,9 @@ def display_employees_by_cabinet(cabinet):
 
 @app.route('/department/<dept>', methods=['GET'])
 def display_employees_by_department(dept):
+    if dept not in departments:
+        return page_not_found(f"{dept} is not a valid department")
+
     dept = dept.upper()
     sums_by_year = salaries.pivot(filter={'Department':dept}, agg="sum", group_by="Year", pivot_on=common_pivots)
     avgs_by_year = salaries.pivot(filter={'Department':dept}, agg="avg", group_by="Year", pivot_on=common_pivots)
@@ -104,6 +119,10 @@ def display_employees_by_department(dept):
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
 def display_employees_by_program(dept, program):
+    if dept not in departments:
+        return page_not_found(f"{dept} is not a valid department")
+    if program not in programs:
+        return page_not_found(f"{program} is not a valid program")
     dept = dept.upper()
     program = program.upper()
     sums_by_year = salaries.pivot(filter={"$and" : [{'Department':dept},{'Program':program}]}, agg="sum", group_by="Year", pivot_on=common_pivots)
