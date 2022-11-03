@@ -150,6 +150,6 @@ def display_employees_by_program(dept, program):
         
 
 if __name__ == '__main__':
-    app.run(debug=True, load_dotenv=False)
+    app.run(load_dotenv=False)
 
 
