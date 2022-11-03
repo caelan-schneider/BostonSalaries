@@ -1,5 +1,6 @@
 # BostonSalaries 
-Welcome to my project! This interactive web app allows users to query data and see interesting visualizations about Boston City Employee pay!
+Welcome to my project! This interactive web app allows users to query data and see interesting visualizations about Boston City Employee pay, with the goal of promoting transparency.
+
 It's built on Python, Flask, Pandas, NumPy, JavaScript, D3.js, HTML, and MongoDB.
 Data is sourced from Boston's Open Data Portal: https://data.boston.gov/dataset/employee-earnings-report
 
