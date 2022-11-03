@@ -14,6 +14,7 @@ common_pivots = ["Regular", "Retro", "Overtime", "Injury", "Other", "Total"]
 cabinets = salaries.unique_values(filter={}, field="Cabinet")
 departments = salaries.unique_values(filter={}, field="Department")
 programs = salaries.unique_values(filter={}, field="Program")
+path_root = os.environ.get("PATH_ROOT")
 
 @app.route('/')
 def display_all(): 
@@ -24,7 +25,7 @@ def display_all():
     years = salaries.unique_values(filter={}, field="Year", is_desc=True)
     
     return render_template('index.html' \
-        , path_root = "http://localhost:5000/" \
+        , path_root = path_root \
         , sums_by_year = sums_by_year \
         , avgs_by_year = avgs_by_year \
         , injured_employees_by_year = injured_employees_by_year \
@@ -88,7 +89,7 @@ def display_employees_by_cabinet(cabinet):
     years = salaries.unique_values(filter={'Cabinet': cabinet}, field="Year", is_desc=True)
 
     return render_template('index.html' \
-        , path_root = "http://localhost:5000/" \
+        , path_root = path_root \
         , division_type = "cabinet" \
         , division_value = cabinet \
         , sums_by_year = sums_by_year \
@@ -111,7 +112,7 @@ def display_employees_by_department(dept):
     years = salaries.unique_values(filter={'Department':dept}, field="Year", is_desc=True)
 
     return render_template('index.html' \
-        , path_root = "http://localhost:5000/" \
+        , path_root = path_root \
             
         , division_type = "department" \
         , division_value = dept \
@@ -138,7 +139,7 @@ def display_employees_by_program(dept, program):
     years = salaries.unique_values(filter={"$and" : [{'Department':dept},{'Program':program}]}, field="Year", is_desc=True)
 
     return render_template('index.html' \
-        , path_root = "http://localhost:5000/" \
+        , path_root = path_root \
         , division_type = "program" \
         , division_value = program \
         , dept = dept \
