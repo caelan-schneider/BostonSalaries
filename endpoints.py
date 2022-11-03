@@ -1,10 +1,16 @@
 from flask import Flask, jsonify, request, render_template
 from utils import MongoCollection
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
-common_pivots = ["Regular", "Retro", "Overtime", "Injury", "Other", "Total"]
-salaries = MongoCollection(app, db_name="boston_salaries", collection_name="salaries")
+load_dotenv(encoding="utf-16")
+password = os.environ.get("MONGODB_PASSWORD")
+DATABASE_URL = f'mongodb+srv://cpschneider98:{password}@sharednamr.nxmopyw.mongodb.net/?retryWrites=false&w=majority'
 
+salaries = MongoCollection(app, collection_name="salaries", connection_str=DATABASE_URL)
+
+common_pivots = ["Regular", "Retro", "Overtime", "Injury", "Other", "Total"]
 cabinets = salaries.unique_values(filter={}, field="Cabinet")
 departments = salaries.unique_values(filter={}, field="Department")
 programs = salaries.unique_values(filter={}, field="Program")
@@ -144,6 +150,6 @@ def display_employees_by_program(dept, program):
         
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, load_dotenv=False)
 
 
