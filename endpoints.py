@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 app = Flask(__name__)
-load_dotenv(encoding="utf-16")
+load_dotenv()
 password = os.environ.get("MONGODB_PASSWORD")
 DATABASE_URL = f'mongodb+srv://cpschneider98:{password}@sharednamr.nxmopyw.mongodb.net/?retryWrites=false&w=majority'
 
