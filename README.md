@@ -6,6 +6,13 @@ Data is sourced from Boston's Open Data Portal: https://data.boston.gov/dataset/
 
 Link to the production app (hosted on MongoDB Atlas and Heroku): https://city-employee-salaries.herokuapp.com/
 
-Note: Heroku has a 30 second limit before the application will time out. The landing page has data for all Boston employees, so it can be slow and sometime pass the 30 second threshold, causing a failure. 
-If the application fails to load, try again later, or try filtering for a specific department, 
-e.g. https://city-employee-salaries.herokuapp.com/department/police%20department. I will try to speed up the landing page query through caching!
+Note: If the application fails to load, try filtering for a specific department, e.g. https://city-employee-salaries.herokuapp.com/department/police%20department. 
+The initial landing page sometimes times out because it's query data for the whole city.
+
+TODO:
+* Implement caching for landing page query.
+* Automate data load / transformation by migrating to a prefect pipeline.
+* Add more interactivity to existing widgets.
+* Add data for total department expenses, so user can see percentage of spend that is employee salaries.
+* Add time series widget on landing page to compare departments.
+* Create new heat map widget using zip-code data so user can see the most common areas employees live.
