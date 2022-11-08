@@ -7,7 +7,7 @@ Data is sourced from Boston's Open Data Portal: https://data.boston.gov/dataset/
 Link to the production app (hosted on MongoDB Atlas and Heroku): https://city-employee-salaries.herokuapp.com/
 
 Note: If the application fails to load, try filtering for a specific department, e.g. https://city-employee-salaries.herokuapp.com/department/police%20department. 
-The initial landing page sometimes times out because it's query data for the whole city.
+The initial landing page sometimes times out because it's querying data for the whole city.
 
 TODO:
 * Implement caching for landing page query.
