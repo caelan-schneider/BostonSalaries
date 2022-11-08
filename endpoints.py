@@ -38,8 +38,8 @@ def page_not_found(error):
 
 @app.route('/employee/', methods=['GET'])
 def employee_by_name_json():
-    first = request.args.get('first')
-    last = request.args.get('last')
+    first = request.args.get('first').upper()
+    last = request.args.get('last').upper()
     docs = salaries.get_documents(filter={'First':first, 'Last':last})
     if len(docs) == 0:
         return page_not_found(f"No record of employee with name {first} {last}")
@@ -78,6 +78,7 @@ def division_options_json():
 
 @app.route('/cabinet/<cabinet>', methods=['GET'])
 def display_employees_by_cabinet(cabinet):
+    cabinet = cabinet.upper
     if cabinet not in cabinets:
         return page_not_found(f"{cabinet} is not a valid cabinet")
 
@@ -101,10 +102,10 @@ def display_employees_by_cabinet(cabinet):
 
 @app.route('/department/<dept>', methods=['GET'])
 def display_employees_by_department(dept):
+    dept = dept.upper()
     if dept not in departments:
         return page_not_found(f"{dept} is not a valid department")
 
-    dept = dept.upper()
     sums_by_year = salaries.pivot(filter={'Department':dept}, agg="sum", group_by="Year", pivot_on=common_pivots)
     avgs_by_year = salaries.pivot(filter={'Department':dept}, agg="avg", group_by="Year", pivot_on=common_pivots)
     injured_employees_by_year = salaries.count_instance_of_field(filter={"Department": dept}, field="Injury", group_by="Year")
@@ -126,6 +127,7 @@ def display_employees_by_department(dept):
 
 @app.route('/department/<dept>/program/<program>', methods=['GET'])
 def display_employees_by_program(dept, program):
+    dept, program = dept.upper(), program.upper()
     if dept not in departments:
         return page_not_found(f"{dept} is not a valid department")
     if program not in programs:
