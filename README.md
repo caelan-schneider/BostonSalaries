@@ -8,4 +8,4 @@ Link to the production app (hosted on MongoDB Atlas and Heroku): https://city-em
 
 Note: Heroku has a 30 second limit before the application will time out. The landing page has data for all Boston employees, so it can be slow and sometime pass the 30 second threshold, causing a failure. 
 If the application fails to load, try again later, or try filtering for a specific department, 
-e.g. https://city-employee-salaries.herokuapp.com/department/police%20department. I will try to speed up the initial query soon!
+e.g. https://city-employee-salaries.herokuapp.com/department/police%20department. I will try to speed up the landing page query through caching!
