@@ -6,4 +6,6 @@ Data is sourced from Boston's Open Data Portal: https://data.boston.gov/dataset/
 
 Link to the production app (hosted on MongoDB Atlas and Heroku): https://city-employee-salaries.herokuapp.com/
 
-Note: Heroku has a 30 second limit before the application will time out. The initial connection to MongoDB Atlas can be slow as I'm on the free tier (though querying it is super fast!). If the application fails to load, try again later, it's probably due to a slow connection between Heroku and MongoDB Atlas. I will fix this soon!
+Note: Heroku has a 30 second limit before the application will time out. The landing page has data for all Boston employees, so it can be slow and sometime pass the 30 second threshold, causing a failure. 
+If the application fails to load, try again later, or try filtering for a specific department, 
+e.g. https://city-employee-salaries.herokuapp.com/department/police%20department. I will try to speed up the initial query soon!
