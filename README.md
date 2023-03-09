@@ -4,12 +4,10 @@ Welcome to my project! This interactive web app allows users to query data and s
 It's built on Python, Flask, Pandas, NumPy, JavaScript, D3.js, HTML, and MongoDB.
 Data is sourced from Boston's Open Data Portal: https://data.boston.gov/dataset/employee-earnings-report
 
-Link to the production app (hosted on MongoDB Atlas and Heroku): https://city-employee-salaries.herokuapp.com/
 
-Note: If the application fails to load, try filtering for a specific department, e.g. https://city-employee-salaries.herokuapp.com/department/police%20department. 
-The initial landing page sometimes times out because it's querying data for the whole city.
+UPDATE 2023 - Salesforce has eliminated the free tier of Heroku, so unfortunately the app is no longer in production. When I have time, I'll find another hosting service.
 
-TODO:
+Other TODOs:
 * Implement caching for landing page query.
 * Automate data load / transformation by migrating to a prefect pipeline.
 * Add more interactivity to existing widgets.
