@@ -78,7 +78,6 @@ def division_options_json():
 
 @app.route('/cabinet/<cabinet>', methods=['GET'])
 def display_employees_by_cabinet(cabinet):
-    cabinet = cabinet.upper
     if cabinet not in cabinets:
         return page_not_found(f"{cabinet} is not a valid cabinet")
 
@@ -88,7 +87,6 @@ def display_employees_by_cabinet(cabinet):
     injured_employees_by_year = salaries.count_instance_of_field(filter={"Cabinet": cabinet}, field="Injury", group_by="Year")
     employees_by_year =salaries.count_instance_of_field(filter={"Cabinet": cabinet}, field="Total", group_by="Year")
     years = salaries.unique_values(filter={'Cabinet': cabinet}, field="Year", is_desc=True)
-
     return render_template('index.html' \
         , path_root = path_root \
         , division_type = "cabinet" \
@@ -114,7 +112,6 @@ def display_employees_by_department(dept):
 
     return render_template('index.html' \
         , path_root = path_root \
-            
         , division_type = "department" \
         , division_value = dept \
         , sums_by_year = sums_by_year \
@@ -153,6 +150,7 @@ def display_employees_by_program(dept, program):
         
 
 if __name__ == '__main__':
-    app.run(load_dotenv=False)
+    print(salaries.pivot(filter={'Cabinet': "EDUCATION"}, agg="sum", group_by="Year", pivot_on=common_pivots))
+    app.run(load_dotenv=False, port=4999)
 
 
